@@ -1,7 +1,6 @@
 #Define Env variable for golang.
 export GOVERSION="go1.7.1"
 export GOPATH=$(PWD)
-export GOBIN="$GOPATH/bin"
 
 NAME = gomoku
 SDL2 = github.com/veandco/go-sdl2/sdl
