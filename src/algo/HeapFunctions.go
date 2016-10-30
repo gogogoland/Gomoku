@@ -50,6 +50,7 @@ func (heapList *PrioQueue) Less(i, j int) bool {
 	var order bool
 
 	//	Check deepness and scoring value
+	order = heapList[i].deep <= heapList[j].deep
 	return order
 }
 
@@ -81,10 +82,7 @@ func InitHeapList(gameData GameData, deepness int) *PrioQueue {
 			facundo: Player{
 				atenum: gameData.facundo.atenum,
 				whoiam: gameData.facundo.whoiam,
-				pawn_p: Pawns{
-					x: gameData.facundo.pawn_p.x,
-					y: gameData.facundo.pawn_p.y,
-				},
+				pawn_p: PawnsInit(gameData.facundo.pawn_p.x, gameData.facundo.pawn_p.y),
 				five_w: five_f,
 				threef: gameData.facundo.threef,
 				haswin: gameData.facundo.haswin,
@@ -93,10 +91,7 @@ func InitHeapList(gameData GameData, deepness int) *PrioQueue {
 			human: Player{
 				atenum: gameData.human.atenum,
 				whoiam: gameData.human.whoiam,
-				pawn_p: Pawns{
-					x: gameData.human.pawn_p.x,
-					y: gameData.human.pawn_p.y,
-				},
+				pawn_p: PawnsInit(gameData.human.pawn_p.x, gameData.human.pawn_p.y),
 				five_w: five_h,
 				threef: gameData.human.threef,
 				haswin: gameData.human.haswin,
@@ -104,11 +99,8 @@ func InitHeapList(gameData GameData, deepness int) *PrioQueue {
 			},
 			board: newBoard,
 			deep:  deepness,
-			move: Pawns{
-				x: gameData.move.x,
-				y: gameData.move.y,
-			},
-			prob: gameData.prob,
+			move:  PawnsInit(gameData.move.x, gameData.move.y),
+			prob:  gameData.prob,
 		},
 	}
 	return nil

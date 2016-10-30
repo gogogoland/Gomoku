@@ -13,10 +13,10 @@
 package algo
 
 /**
- * TODO:
- * 		replace calcul by kernel(GPU)
- * 		GetPossiblePlace to do (return list pawns and his size)
+ * Function of pathfinding
  *
+ * TODO:
+ * 		Maybe stop the A* when best move detect
  * 		NOTHING
 **/
 
@@ -39,11 +39,11 @@ func Pathfinding(Mom GameData, deepness, IA int) NextPawns {
 	for len(*open) > 0 {
 
 		childs = heap.Pop(open)
-		childPawn = GetPossiblePlace(cur)
+		childPawn = GetPossiblePlace(childs)
 		childNum = len(childPawn)
 
 		for i := 0; i < childNum; i++ {
-			/*In MinMax : check value + rules + add first move if no move save*/
+			/*In MinMax : check value + rules*/
 			go MinMax(childs, childPawn[i], link)
 		}
 
@@ -123,6 +123,39 @@ func UseOfIA(childs GameData, IA int) int {
 		return childs.human.winpot * childs.prob * -1
 	}
 	return 0.0
+}
+
+func GetPossiblePlace(gd GameData) []NextPawns {
+	var np []NextPawns
+	var curx, cury, i int
+	var xmax, ymax int
+	var np_size int
+	var authPlayer int
+
+	i = 0
+	np_size = 0
+	xmax = len(gd.board)
+	ymax = len(gd.board[0])
+	authPlayer = GetOtherTurn(gd) * -1
+	for curx = 0; curx < xmax; curx++ {
+		for cury = 0; cury < ymax; cury++ {
+			if !gd.board[x][y] || gd.board[x][y] == authPlayer {
+				np_size++
+			}
+		}
+	}
+
+	gd.prob = np_size
+	np = make(NextPawns, np_size)
+	for curx = 0; curx < xmax; curx++ {
+		for cury = 0; cury < ymax; cury++ {
+			if !gd.board[x][y] || gd.board[x][y] == authPlayer {
+				np[i] = NextPawnsInit(curx, cury, 0.0, np_size)
+				i++
+			}
+		}
+	}
+	return np
 }
 
 //	*	MinMax

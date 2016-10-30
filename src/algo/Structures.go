@@ -35,7 +35,6 @@ type Pawns struct {
 type AlingnW struct {
 	pos Pawns
 	dir int
-	win bool
 }
 
 //	*	Player data
@@ -57,6 +56,7 @@ type GameData struct {
 	deep  int
 	move  Pawns
 	prob  int
+	turn  int
 }
 
 //	*	Potential Move
