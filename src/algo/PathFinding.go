@@ -157,8 +157,3 @@ func GetPossiblePlace(gd GameData) []NextPawns {
 	}
 	return np
 }
-
-//	*	MinMax
-/*func MinMax(cur GameData, pawns Pawns, link chan GameData) {
-	<-link
-}*/

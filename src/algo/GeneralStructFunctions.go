@@ -16,11 +16,12 @@ package algo
  * Functions for NextPawns structures
  *
  * TODO:
+ * 		copy of GameData to Test
  * 		NOTHING
 **/
 
-func AlignWInit(x, y, dir int) AlignW {
-	return AlignW{
+func AlignPInit(x, y, dir int) AlignP {
+	return AlignP{
 		pos: PawnsInit(x, y),
 		dir: dir,
 	}
@@ -50,4 +51,28 @@ func GetOtherTurn(gd GameData) int {
 		newTurn = gd.human.whoiam
 	}
 	return newTurn
+}
+
+func CompareAlignP(ap1, ap2 AlignP) bool {
+	return (ComparePawn(ap1.pos, ap2.pos) && ap1.dir == ap2.dir)
+}
+
+func ComparePawn(p1, p2 Pawn) bool {
+	return (p1.x == p2.x && p1.y == p2.y)
+}
+
+func AddAlignP(lst []AlignP, new AlignP) {
+	var cur, len int
+
+	len = len(lst)
+	for cur = 0; cur < len; cur++ {
+		if CompareAlignP(lst[cur], new) {
+			return
+		}
+	}
+	lst = append(lst, new)
+}
+
+func CopyGameData(tocopy, theone GameData) {
+	*theone = *tocopy
 }

@@ -13,6 +13,8 @@
 package algo
 
 /**
+ * All import and used structure for MinMax
+ *
  * 	TODO:
  * 		NOTHING
 **/
@@ -32,7 +34,7 @@ type Pawns struct {
 }
 
 //	*	Win Alignement
-type AlingnW struct {
+type AlignP struct {
 	pos Pawns
 	dir int
 }
@@ -42,8 +44,8 @@ type Player struct {
 	atenum int
 	whoiam int
 	pawn_p Pawns
-	five_w []AlignW
-	threef bool
+	five_w []AlignP
+	threef []AlignP
 	haswin bool
 	winpot float32
 }
@@ -57,6 +59,8 @@ type GameData struct {
 	move  Pawns
 	prob  int
 	turn  int
+	//Add probabilty ?
+	//wilo	float32
 }
 
 //	*	Potential Move

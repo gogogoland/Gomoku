@@ -13,8 +13,9 @@
 package algo
 
 /**
+ * Function intern of GameData heaplist
+ *
  * TODO:
- * 		Complete these functions : Less
  * 		NOTHING
 **/
 
@@ -45,13 +46,9 @@ func (heapList *PrioQueue) Swap(i, j int) {
 	heapList[i], heapList[j] = heapList[j], heapList[i]
 }
 
-//	*	Check order
+//	*	Check order by deepness and scoring value
 func (heapList *PrioQueue) Less(i, j int) bool {
-	var order bool
-
-	//	Check deepness and scoring value
-	order = heapList[i].deep <= heapList[j].deep
-	return order
+	return heapList[i].prob*heapList[i].deep > heapList[j].prob*heapList[j].deep
 }
 
 //	*	Get len
@@ -105,15 +102,3 @@ func InitHeapList(gameData GameData, deepness int) *PrioQueue {
 	}
 	return nil
 }
-
-//	*	Delete similar case
-/*func AddUnredundand(new GamesData, lst PrioQueue) {
-	max := len(lst)
-	for i := 0; i < max; i++ {
-		// Check pawns + eat + alignW of each player
-		//	If same, and old is the deepest one, pop it and add new
-		//	else add it
-			heap.Push(lst, new)
-			heap.Fix(lst, len(*lst)-1)
-	}
-}*/
