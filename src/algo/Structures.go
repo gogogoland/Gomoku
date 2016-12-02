@@ -19,13 +19,13 @@ package algo
  * 		NOTHING
 **/
 
-import (
-	"container/heap"
-	"container/list"
-	"fmt"
-	"github.com/samuel/go-opencl/cl"
-	"math"
-)
+//import (
+//	"container/heap"
+//	"container/list"
+//	"fmt"
+//	/*"github.com/samuel/gop-opencl/cl"*/
+//	"math"
+//)
 
 //	Structures
 //	*	Position of Pawns
@@ -70,5 +70,5 @@ type NextPawns struct {
 	test_n int
 }
 
-//	*	Slice of MinMax
-type PrioQueue []MinMax
+//	*	Slice of MinMax data
+type PrioQueue []GameData

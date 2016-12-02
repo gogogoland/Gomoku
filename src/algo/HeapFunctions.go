@@ -16,19 +16,19 @@ package algo
  * Function intern of GameData heaplist
  *
  * TODO:
- * 		NOTHING
+ * 		Test comparaison
 **/
 
 // Intern functions for HeapList
 //	*	Add
 func (heapList *PrioQueue) Push(toAdd interface{}) {
-	*heapList = append(*heapList, GamesData{
-		facundo: toAdd.(GamesData).facundo,
-		human:   toAdd.(GamesData).human,
-		board:   toAdd.(GamesData).board,
-		deep:    toAdd.(GamesData).deep,
-		move:    toAdd.(GamesData).move,
-		prob:    toAdd.(GamesData).prob,
+	*heapList = append(*heapList, GameData{
+		facundo: toAdd.(GameData).facundo,
+		human:   toAdd.(GameData).human,
+		board:   toAdd.(GameData).board,
+		deep:    toAdd.(GameData).deep,
+		move:    toAdd.(GameData).move,
+		prob:    toAdd.(GameData).prob,
 	})
 }
 
@@ -42,30 +42,34 @@ func (heapList *PrioQueue) Pop() interface{} {
 }
 
 //	*	Swap data
-func (heapList *PrioQueue) Swap(i, j int) {
+func (heapList PrioQueue) Swap(i, j int) {
 	heapList[i], heapList[j] = heapList[j], heapList[i]
 }
 
 //	*	Check order by deepness and scoring value
-func (heapList *PrioQueue) Less(i, j int) bool {
-	return heapList[i].prob*heapList[i].deep > heapList[j].prob*heapList[j].deep
+func (heapList PrioQueue) Less(i, j int) bool {
+	if heapList[i].prob == heapList[j].prob {
+		return heapList[i].deep > heapList[j].deep
+	}
+	return heapList[i].prob > heapList[j].prob
+	//return heapList[i].prob*heapList[i].deep > heapList[j].prob*heapList[j].deep
 }
 
 //	*	Get len
-func (heapList *PrioQueue) Len() int {
+func (heapList PrioQueue) Len() int {
 	return len(heapList)
 }
 
 // Extern functions
 //	*	Init HeapList
 func InitHeapList(gameData GameData, deepness int) *PrioQueue {
-	var five_f, five_h []AlignW
+	var five_f, five_h []AlignP
 	var newBoard [][]int
 	var max int
 
-	five_f = make([]AlignW, len(gameData.facundo.five_w))
+	five_f = make([]AlignP, len(gameData.facundo.five_w))
 	copy(five_f, gameData.facundo.five_w)
-	five_h = make([]AlignW, len(gameData.human.five_w))
+	five_h = make([]AlignP, len(gameData.human.five_w))
 	copy(five_h, gameData.human.five_w)
 	max = len(gameData.board)
 	newBoard = make([][]int, max)
@@ -75,7 +79,7 @@ func InitHeapList(gameData GameData, deepness int) *PrioQueue {
 	}
 
 	return &PrioQueue{
-		GamesData{
+		GameData{
 			facundo: Player{
 				atenum: gameData.facundo.atenum,
 				whoiam: gameData.facundo.whoiam,

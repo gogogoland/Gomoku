@@ -12,11 +12,19 @@
 
 package algo
 
+import (
+	"container/heap"
+	"fmt"
+	"runtime"
+)
+
 /**
  * Function of pathfinding
  *
  * TODO:
  * 		Maybe stop the A* when best move detect
+ * 		Seek Goroutine
+ *		Add timer
  * 		NOTHING
 **/
 
@@ -26,19 +34,23 @@ func Pathfinding(Mom GameData, deepness, IA int) NextPawns {
 	var childNum int
 	var childs GameData
 	var link chan GameData
-	var open, close PrioQueue
-	var childPawn *NextPawns
+	var open *PrioQueue
+	var childPawn []NextPawns
+
+	//	Set number of proc
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	fmt.Println(runtime.NumGoroutine())
 
 	//	Init Heap
-	open = InitAddGameDataToHeapList(open, Mom, deepness)
-	close = nil
+	open = InitHeapList(Mom, deepness)
+	heap.Init(open)
+
 	//	Make link between goroutine and original tree
 	link = make(chan GameData)
 
 	//	Run A* for MinMax
 	for len(*open) > 0 {
-
-		childs = heap.Pop(open)
+		childs = heap.Pop(open).(GameData)
 		childPawn = GetPossiblePlace(childs)
 		childNum = len(childPawn)
 
@@ -49,12 +61,32 @@ func Pathfinding(Mom GameData, deepness, IA int) NextPawns {
 
 		for i := 0; i < childNum; i++ {
 			childs = <-link
-			if childs.human.winpot >= 1.0 || child.facundo.winpot >= 1.0 || !childs.deep {
-				child.prob = GetProbalityByDeepness(childs.deep, childNum, 1)
-				if close {
+			/*
+			 *
+			 */
+			childs.prob = GetProbabilityByDeepness(childs.deep, childNum, 1)
+			AddGameDataToHeapList(open, childs)
+			if childs.human.winpot >= 1.0 || childs.facundo.winpot >= 1.0 || childs.deep == 0 {
+				return GetOptimalPath(open, GetPossiblePlace(Mom), IA)
+			}
+		}
+	}
+	return GetOptimalPath(open, GetPossiblePlace(Mom), IA)
+}
+
+/*
+ *
+ */
+
+/*
+			//ADD close heaplist
+			if childs.human.winpot >= 1.0 || childs.facundo.winpot >= 1.0 || childs.deep == 0 {
+				childs.prob = GetProbabilityByDeepness(childs.deep, childNum, 1)
+				if close != nil {
 					AddGameDataToHeapList(close, childs)
 				} else {
 					close = InitGameDataToHeapList(close, childs, childs.deep)
+					heap.Init(close)
 				}
 			} else {
 				AddGameDataToHeapList(open, childs)
@@ -64,6 +96,7 @@ func Pathfinding(Mom GameData, deepness, IA int) NextPawns {
 	}
 	return GetOptimalPath(close, GetPossiblePlace(Mom), IA)
 }
+*/
 
 //	Init priorityqueue
 func InitGameDataToHeapList(list *PrioQueue, gameData GameData, deep int) *PrioQueue {
@@ -79,31 +112,31 @@ func AddGameDataToHeapList(list *PrioQueue, gameData GameData) {
 }
 
 //	Get greater probability by low deepness
-func GetProbabiltyByDeepness(deep, probmax, probmin int) int {
-	if deep {
+func GetProbabilityByDeepness(deep, probmax, probmin int) int {
+	if deep != 0 {
 		return probmax
 	}
 	return probmin
 }
 
 //	Get best move for current close list
-func GetOptimalPath(close PrioQueue, childPawn *NextPawns, IA int) NextPawns {
+func GetOptimalPath(close *PrioQueue, childPawn []NextPawns, IA int) NextPawns {
 	var FacundoMove NextPawns
 	var childNum int
 	var childs GameData
 
-	FacundoMove = nil
+	FacundoMove = NextPawnsInit(-1, -1, 0.0, 0)
 	childNum = len(childPawn)
-	for len(*close) {
-		childs = heap.Pop(close)
+	for len(*close) > 0 {
+		childs = heap.Pop(close).(GameData)
 		i := 0
-		for childs.move.x != childPawn[i].x || childPawn[i].y != childs.move.x {
+		for childs.move.x != childPawn[i].pawn_p.x || childPawn[i].pawn_p.y != childs.move.x {
 			i++
 		}
-		childPawn[i].winpot *= childPawn[i].test_n
+		childPawn[i].winpot *= (float32)(childPawn[i].test_n)
 		childPawn[i].test_n += childs.prob
-		childPawn[i].winpot += UseOfIA(childs, IA)
-		childPawn[i].winpot = childPawn[i].winpot / childPawn[i].test_n
+		childPawn[i].winpot += (float32)(UseOfIA(childs, IA))
+		childPawn[i].winpot = childPawn[i].winpot / (float32)(childPawn[i].test_n)
 	}
 
 	for i := 0; i < childNum; i++ {
@@ -116,15 +149,16 @@ func GetOptimalPath(close PrioQueue, childPawn *NextPawns, IA int) NextPawns {
 }
 
 //	Use of different IA
-func UseOfIA(childs GameData, IA int) int {
-	if IA {
-		return childs.facundo.winpot * childs.prob
-	} else if !IA {
-		return childs.human.winpot * childs.prob * -1
+func UseOfIA(childs GameData, IA int) float32 {
+	if IA == 1 {
+		return childs.facundo.winpot * (float32)(childs.prob)
+	} else if IA == 0 {
+		return childs.human.winpot * (float32)(childs.prob) * -1.0
 	}
 	return 0.0
 }
 
+//	Get all avaible places for current player
 func GetPossiblePlace(gd GameData) []NextPawns {
 	var np []NextPawns
 	var curx, cury, i int
@@ -139,18 +173,18 @@ func GetPossiblePlace(gd GameData) []NextPawns {
 	authPlayer = GetOtherTurn(gd) * -1
 	for curx = 0; curx < xmax; curx++ {
 		for cury = 0; cury < ymax; cury++ {
-			if !gd.board[x][y] || gd.board[x][y] == authPlayer {
+			if gd.board[curx][cury] != 0 || gd.board[curx][cury] == authPlayer {
 				np_size++
 			}
 		}
 	}
 
 	gd.prob = np_size
-	np = make(NextPawns, np_size)
+	np = make([]NextPawns, np_size)
 	for curx = 0; curx < xmax; curx++ {
 		for cury = 0; cury < ymax; cury++ {
-			if !gd.board[x][y] || gd.board[x][y] == authPlayer {
-				np[i] = NextPawnsInit(curx, cury, 0.0, np_size)
+			if gd.board[curx][cury] != 0 || gd.board[curx][cury] == authPlayer {
+				np[i] = NextPawnsInit(curx, cury, np_size, 0.0)
 				i++
 			}
 		}
