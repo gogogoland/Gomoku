@@ -160,17 +160,21 @@ func AddAuthorizedMove(board [][]int, player Player) {
 
 //	Check ate pawn (around player.Coord)
 func CheckEatPawn(child GameData, pawn Pawns) {
-	var x, y int
+	var x, y, px, py int
 	var otherPlayer int
 
 	otherPlayer = GetOtherTurn(child)
-	for x = -2; x <= 2; x += 2 {
-		for y = -2; y <= 2; y += 2 {
-			if (x >= 0 || y >= 0 || x < len(child.board) || y < len(child.board[0])) && child.board[pawn.x+x][pawn.y+y] == child.turn && child.board[pawn.x+(x%2)][pawn.y+(y%2)] == otherPlayer {
-				AddAteNumPlayer(child, pawn.x+(x%2), pawn.y+(y%2))
+	for x = -3; x <= 3; x += 3 {
+		for y = -3; y <= 3; y += 3 {
+			px, py = pawn.x + x, pawn.y + y
+			if (px >= 0 || py >= 0 || px < len(child.board) || py < len(child.board[0])) && child.board[px][py] == child.turn && child.board[px-(x/3)][py-(y/3)] == otherPlayer && child.board[px-(2*x/3)][py-(2*y/3)] == otherPlayer {
+				AddAteNumPlayer(child, px-(x/3), py - (y/3),px - (2*x/3), py-(2*y/3))
 				CheckAlignement(child, Pawns{
-					x: pawn.x + (x % 2),
-					y: pawn.y + (y % 2)})
+					x: px - (x / 3),
+					y: py - (y / 3)})
+				CheckAlignement(child, Pawns{
+					x: px - (2 * x / 3),
+					y: py - (2 * y / 3)})
 				//CheckUnauthorizetMove(child, Pawns{
 				//	x: pawn.x + (x % 2),
 				//	y: pawn.y + (y % 2)})
@@ -233,8 +237,9 @@ func CheckAlignPawnLocal(board [][]int, threef AlignP, whoiam int) (int, int) {
 }
 
 //	Increase value of Pawn ate by player
-func AddAteNumPlayer(child GameData, x, y int) {
-	child.board[x][y] = 0
+func AddAteNumPlayer(child GameData, x1, y1, x2, y2 int) {
+	child.board[x1][y1] = 0
+	child.board[x2][y2] = 0
 	if child.turn == child.facundo.whoiam {
 		child.facundo.atenum++
 	} else if child.turn == child.human.whoiam {
