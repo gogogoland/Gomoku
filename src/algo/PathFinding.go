@@ -16,6 +16,7 @@ import (
 	"container/heap"
 	"fmt"
 	"runtime"
+	"time"
 )
 
 /**
@@ -36,6 +37,9 @@ func Pathfinding(Mom GameData, deepness, IA int) NextPawns {
 	var link chan GameData
 	var open *PrioQueue
 	var childPawn []NextPawns
+
+	//	Start timer
+	timeStart := time.Now()
 
 	//	Set number of proc
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -67,11 +71,11 @@ func Pathfinding(Mom GameData, deepness, IA int) NextPawns {
 			childs.prob = GetProbabilityByDeepness(childs.deep, childNum, 1)
 			AddGameDataToHeapList(open, childs)
 			if childs.human.winpot >= 1.0 || childs.facundo.winpot >= 1.0 || childs.deep == 0 {
-				return GetOptimalPath(open, GetPossiblePlace(Mom), IA)
+				return GetOptimalPath(open, GetPossiblePlace(Mom), IA, timeStart)
 			}
 		}
 	}
-	return GetOptimalPath(open, GetPossiblePlace(Mom), IA)
+	return GetOptimalPath(open, GetPossiblePlace(Mom), IA, timeStart)
 }
 
 /*
@@ -120,7 +124,7 @@ func GetProbabilityByDeepness(deep, probmax, probmin int) int {
 }
 
 //	Get best move for current close list
-func GetOptimalPath(close *PrioQueue, childPawn []NextPawns, IA int) NextPawns {
+func GetOptimalPath(close *PrioQueue, childPawn []NextPawns, IA int, timeStart Time) NextPawns {
 	var FacundoMove NextPawns
 	var childNum int
 	var childs GameData
@@ -144,6 +148,9 @@ func GetOptimalPath(close *PrioQueue, childPawn []NextPawns, IA int) NextPawns {
 			FacundoMove = childPawn[i]
 		}
 	}
+
+	timeSince := time.Since(timeStart)
+	fmt.Println("Time required: ", timeSince)
 
 	return FacundoMove
 }
