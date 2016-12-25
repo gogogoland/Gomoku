@@ -46,7 +46,6 @@ type Player struct {
 	pawn_p Pawns
 	five_w []AlignP
 	threef []AlignP
-	haswin bool
 	winpot float32
 }
 
@@ -54,11 +53,12 @@ type Player struct {
 type GameData struct {
 	facundo, human Player
 	//salver is a better name, no ?
-	board [][]int
-	deep  int
-	move  Pawns
-	prob  int
-	turn  int
+	board  [][]int
+	deep   int
+	move   Pawns
+	prob   int
+	turn   int
+	whowin int
 	//Add probabilty ?
 	//wilo	float32
 }

@@ -63,11 +63,13 @@ func (heapList PrioQueue) Len() int {
 // Extern functions
 //	*	Init HeapList
 func InitHeapList(gameData GameData, deepness int) *PrioQueue {
-	var five_f, five_h []AlignP
+	/*var five_f, five_h []AlignP
 	var newBoard [][]int
-	var max int
+	var max int*/
 
-	five_f = make([]AlignP, len(gameData.facundo.five_w))
+	return &PrioQueue{GameDataDeep(gameData, deepness)}
+
+	/*five_f = make([]AlignP, len(gameData.facundo.five_w))
 	copy(five_f, gameData.facundo.five_w)
 	five_h = make([]AlignP, len(gameData.human.five_w))
 	copy(five_h, gameData.human.five_w)
@@ -86,7 +88,6 @@ func InitHeapList(gameData GameData, deepness int) *PrioQueue {
 				pawn_p: PawnsInit(gameData.facundo.pawn_p.x, gameData.facundo.pawn_p.y),
 				five_w: five_f,
 				threef: gameData.facundo.threef,
-				haswin: gameData.facundo.haswin,
 				winpot: gameData.facundo.winpot,
 			},
 			human: Player{
@@ -95,7 +96,6 @@ func InitHeapList(gameData GameData, deepness int) *PrioQueue {
 				pawn_p: PawnsInit(gameData.human.pawn_p.x, gameData.human.pawn_p.y),
 				five_w: five_h,
 				threef: gameData.human.threef,
-				haswin: gameData.human.haswin,
 				winpot: gameData.human.winpot,
 			},
 			board: newBoard,
@@ -103,6 +103,5 @@ func InitHeapList(gameData GameData, deepness int) *PrioQueue {
 			move:  PawnsInit(gameData.move.x, gameData.move.y),
 			prob:  gameData.prob,
 		},
-	}
-	return nil
+	}*/
 }

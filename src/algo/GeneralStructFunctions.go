@@ -46,6 +46,25 @@ func AlignPAdd(lst []AlignP, new AlignP) {
 	lst = append(lst, new)
 }
 
+func AlignPCopy(tocopy AlignP) AlignP {
+	return AlignP{
+		pos: PawnsCopy(tocopy.pos),
+		dir: tocopy.dir,
+	}
+}
+
+func AlignPSliceCopy(tocopy []AlignP) []AlignP {
+	var theone []AlignP
+	var lenAlP, curAlP int
+
+	lenAlP = len(tocopy)
+	theone = make([]AlignP, lenAlP)
+	for curAlP = 0; curAlP < lenAlP; curAlP++ {
+		theone[curAlP] = AlignPCopy(tocopy[curAlP])
+	}
+	return theone
+}
+
 /*
  * Functions for Pawns structures
  */
@@ -60,6 +79,10 @@ func PawnsCompare(p1, p2 Pawns) bool {
 	return (p1.x == p2.x && p1.y == p2.y)
 }
 
+func PawnsCopy(tocopy Pawns) Pawns {
+	return PawnsInit(tocopy.x, tocopy.y)
+}
+
 /*
  * Functions for NextPawns structures
  */
@@ -69,6 +92,14 @@ func NextPawnsInit(x, y, test_n int, winpot float32) NextPawns {
 		pawn_p: PawnsInit(x, y),
 		winpot: winpot,
 		test_n: test_n,
+	}
+}
+
+func NextPawnsCopy(tocopy NextPawns) NextPawns {
+	return NextPawns{
+		pawn_p: PawnsCopy(tocopy.pawn_p),
+		winpot: tocopy.winpot,
+		test_n: tocopy.test_n,
 	}
 }
 
@@ -96,6 +127,22 @@ func BoardIntInit(height, width, value int) [][]int {
 	return board
 }
 
+func BoardIntCopy(tocopy [][]int) [][]int {
+	var theone [][]int
+	var ylen, xlen int
+	var y, x int
+
+	ylen = len(tocopy)
+	theone = make([][]int, ylen)
+	for y = 0; y < ylen; y++ {
+		xlen = len(tocopy[y])
+		for x = 0; x < xlen; x++ {
+			theone[y][x] = tocopy[y][x]
+		}
+	}
+	return theone
+}
+
 /*
  * Functions for Player structures
  */
@@ -107,8 +154,18 @@ func PlayerInit(whoareyou int) Player {
 		pawn_p: PawnsInit(-1, -1),
 		five_w: nil,
 		threef: nil,
-		haswin: false,
 		winpot: 0.0,
+	}
+}
+
+func PlayerCopy(tocopy Player) Player {
+	return Player{
+		atenum: tocopy.atenum,
+		whoiam: tocopy.whoiam,
+		pawn_p: PawnsCopy(tocopy.pawn_p),
+		five_w: AlignPSliceCopy(tocopy.five_w),
+		threef: AlignPSliceCopy(tocopy.threef),
+		winpot: tocopy.winpot,
 	}
 }
 
@@ -125,11 +182,36 @@ func GameDataInit(whobegin int) GameData {
 		move:    PawnsInit(-1, -1),
 		prob:    0,
 		turn:    whobegin,
+		whowin:  0,
 	}
 }
 
-func GameDataCopy(tocopy, theone GameData) {
-	theone = tocopy
+func GameDataCopy(tocopy /*, theone */ GameData) GameData {
+	//theone = tocopy
+	return GameData{
+		facundo: PlayerCopy(tocopy.facundo),
+		human:   PlayerCopy(tocopy.human),
+		board:   BoardIntCopy(tocopy.board),
+		deep:    tocopy.deep,
+		move:    PawnsCopy(tocopy.move),
+		prob:    tocopy.prob,
+		turn:    tocopy.turn,
+		whowin:  tocopy.whowin,
+	}
+}
+
+func GameDataDeep(tocopy GameData, deepness int) GameData {
+	var theone GameData
+
+	theone = GameDataCopy(tocopy)
+	theone.deep = deepness
+	return theone
+}
+
+func GameDataGain(gain GameData) int {
+	gain.whowin = gain.facundo.whoiam * BoolToInt(gain.facundo.winpot >= 1.0)
+	gain.whowin += gain.human.whoiam * BoolToInt(gain.human.winpot >= 1.0)
+	return gain.whowin
 }
 
 /*

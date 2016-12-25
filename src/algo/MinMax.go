@@ -17,6 +17,7 @@ package algo
  *
  * TODO:
  * 		Seek comments inside functions
+ * 		add win
  *
  * 		NOTHING
 **/
@@ -166,9 +167,9 @@ func CheckEatPawn(child GameData, pawn Pawns) {
 	otherPlayer = GetOtherTurn(child)
 	for x = -3; x <= 3; x += 3 {
 		for y = -3; y <= 3; y += 3 {
-			px, py = pawn.x + x, pawn.y + y
+			px, py = pawn.x+x, pawn.y+y
 			if (px >= 0 || py >= 0 || px < len(child.board) || py < len(child.board[0])) && child.board[px][py] == child.turn && child.board[px-(x/3)][py-(y/3)] == otherPlayer && child.board[px-(2*x/3)][py-(2*y/3)] == otherPlayer {
-				AddAteNumPlayer(child, px-(x/3), py - (y/3),px - (2*x/3), py-(2*y/3))
+				AddAteNumPlayer(child, px-(x/3), py-(y/3), px-(2*x/3), py-(2*y/3))
 				CheckAlignement(child, Pawns{
 					x: px - (x / 3),
 					y: py - (y / 3)})
@@ -265,10 +266,13 @@ func AddPawnOnBoard(child GameData, pawn Pawns) {
 //	Check probability (set prob of winning for two party)
 func CheckWinLose(player Player, turn int) {
 	if turn == player.whoiam && len(player.five_w) > 0 {
+		// Check if already five aligned, if so it's a win
 		player.winpot = 1.0
 	} else {
+		// Else get closer to victory by pair of pawns ate
 		player.winpot = (float32)(player.atenum) / 5.0
 	}
+	// For the remain potential, get pre-aligned or newly aligned pawns
 	player.winpot += (1.0 - player.winpot) * (1.0 - (1.0 / (float32)(len(player.threef)+1)))
 	player.winpot += (1.0 - player.winpot) * (0.8 * BoolToFloat32(len(player.five_w) > 0))
 }
@@ -277,14 +281,26 @@ func CheckWinLose(player Player, turn int) {
 func MinMax(childs GameData, pawn NextPawns, link chan GameData) {
 	var child GameData
 
-	GameDataCopy(childs, child)
-	AddPawnOnBoard(child, pawn.pawn_p)
-	CheckWinLose(child.human, child.turn)
-	CheckWinLose(child.facundo, child.turn)
-	CheckEatPawn(child, pawn.pawn_p)
-	CheckAlignement(child, pawn.pawn_p)
-	AddPermissiveMove(child)
-	child.turn = GetOtherTurn(child)
+	/**/ child = /**/ GameDataCopy(childs /*, child */)
+	child = TurnProcess(child, pawn.pawn_p)
 	child.deep--
 	link <- child
+}
+
+//	Turn process
+func TurnProcess(child GameData, pawn Pawns) GameData {
+	// Place new move
+	AddPawnOnBoard(child, pawn)
+	//	Set new potential of victory
+	CheckWinLose(child.human, child.turn)
+	CheckWinLose(child.facundo, child.turn)
+	//	Check Ate pawns during this turn
+	CheckEatPawn(child, pawn)
+	//	Check Alignement for pawns
+	CheckAlignement(child, pawn)
+	//	Change box value for new place
+	AddPermissiveMove(child)
+	//	Set turn value for other player
+	child.turn = GetOtherTurn(child)
+	return child
 }
