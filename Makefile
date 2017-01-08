@@ -15,11 +15,9 @@ $(NAME):
 	go build $(BPKG)
 	go install $(NAME)
 	@printf "Building \033[1;34m$(NAME)\033[0m."
-	@sleep 0.7
-	@printf "."
-	@sleep 0.7
-	@printf ".\n"
 
+submodule:
+	git submodule update --init --recursive 
 
 clean:
 	@rm -rf pkg
