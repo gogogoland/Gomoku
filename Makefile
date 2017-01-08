@@ -3,7 +3,8 @@ export GOVERSION="go1.7.1"
 export GOPATH=$(PWD)
 
 NAME = gomoku
-BPKG = algo\
+
+BPKG = algo \
 	   gomoku\
 	   
 SDL2 = github.com/veandco/go-sdl2/sdl
@@ -11,10 +12,10 @@ SDL2 = github.com/veandco/go-sdl2/sdl
 all: $(NAME)
 
 $(NAME):
-	go get -v $(SDL2)
+	@echo "\033[1;36;m[Compiling $@]\033[0m: "
 	go build $(BPKG)
 	go install $(NAME)
-	@printf "Building \033[1;34m$(NAME)\033[0m."
+	@echo "\033[1;32;m[Done]\033[0m"
 
 submodule:
 	git submodule update --init --recursive 
