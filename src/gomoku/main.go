@@ -3,6 +3,7 @@ package main
 
 import (
 	"os"
+	"tempory_show"
 )
 
 /*
@@ -21,13 +22,11 @@ import (
  * 			See GameData structure in src/algo/Structures.go for game's data
  */
 
-var winTitle string = "Go-SDL2 Events"
-var winWidth, winHeight int = 800, 600
-
 func run() int {
 	return 0
 }
 
 func main() {
+	tempory_show.Example()
 	os.Exit(run())
 }
