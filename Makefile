@@ -4,9 +4,9 @@ export GOPATH=$(PWD)
 
 NAME = gomoku
 
-BPKG = algo \
-	   tempory_show \
-	   gomoku \
+BPKG = 	gui 	\
+		algo 	\
+	   	gomoku
 	   
 all: $(NAME)
 
