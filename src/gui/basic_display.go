@@ -7,14 +7,11 @@ import (
 
 func BasicDisplay(whobegin int) {
 	Init := algo.GameDataInit(whobegin)
-	//Example := [][]int  {{1,2,3,4},
-	//						 {1,2,3,4},
-	//					 {1,2,3,4}}
-	//PrintBoard(Example)
-	test := Init.Board
-	fmt.Println(test)
+	PrintBoard(Init.Board)
 }
 
 func PrintBoard(GameBoard [][]int) {
-
+	for i := 0; i < len(GameBoard) - 1 ; i++{
+		fmt.Println(GameBoard[i])
+	}
 }
