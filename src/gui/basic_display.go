@@ -11,7 +11,7 @@ func BasicDisplay(whobegin int) {
 }
 
 func PrintBoard(GameBoard [][]int) {
-	for i := 0; i < len(GameBoard) - 1 ; i++{
+	for i := 0; i < len(GameBoard); i++{
 		fmt.Println(GameBoard[i])
 	}
 }
