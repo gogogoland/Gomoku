@@ -29,8 +29,8 @@ func CheckAlignement(child GameData, pawn Pawns) {
 	var check, align, dispo int
 
 	align = 0
-	xmax = len(child.board)
-	ymax = len(child.board[0])
+	xmax = len(child.Board)
+	ymax = len(child.Board[0])
 	for s = 0; s < 4 && align < 5; s++ {
 		dispo = 0
 		align = 0
@@ -39,14 +39,14 @@ func CheckAlignement(child GameData, pawn Pawns) {
 			y = pawn.y + check*(s%2-BoolToInt(s == 0))
 			if x < 0 || y < 0 || x >= xmax || y >= ymax {
 				continue
-			} else if child.board[x][y] == child.turn {
+			} else if child.Board[x][y] == child.turn {
 				dispo++
 				align++
 			} else {
-				if child.board[x][y] <= 0 && align > 0 {
+				if child.Board[x][y] <= 0 && align > 0 {
 					dispo++
 				} else {
-					dispo = BoolToInt(child.board[x][y] <= 0)
+					dispo = BoolToInt(child.Board[x][y] <= 0)
 				}
 				align = 0
 			}
@@ -72,42 +72,42 @@ func CheckAlignement(child GameData, pawn Pawns) {
 //	Put unauthorized and authorized move
 func AddPermissiveMove(child GameData) {
 	if len(child.facundo.threef) > 0 {
-		AddUnauthorizedMove(child.board, child.facundo.whoiam, child.human.whoiam)
-		AddAuthorizedThreef(child.board, child.facundo)
+		AddUnauthorizedMove(child.Board, child.facundo.whoiam, child.human.whoiam)
+		AddAuthorizedThreef(child.Board, child.facundo)
 	} else {
-		AddAuthorizedMove(child.board, child.facundo)
+		AddAuthorizedMove(child.Board, child.facundo)
 	}
 	if len(child.human.threef) > 0 {
-		AddUnauthorizedMove(child.board, child.human.whoiam, child.facundo.whoiam)
-		AddAuthorizedThreef(child.board, child.human)
+		AddUnauthorizedMove(child.Board, child.human.whoiam, child.facundo.whoiam)
+		AddAuthorizedThreef(child.Board, child.human)
 	} else {
-		AddAuthorizedMove(child.board, child.human)
+		AddAuthorizedMove(child.Board, child.human)
 	}
 }
 
 //	Add alls unauthorized move for player
-func AddUnauthorizedMove(board [][]int, curPlayer, othPlayer int) {
+func AddUnauthorizedMove(Board [][]int, curPlayer, othPlayer int) {
 	var xmax, ymax int
 	var x, y int
 	var ix, iy int
 	var s int
 	var i int
 
-	xmax = len(board)
-	ymax = len(board[0])
+	xmax = len(Board)
+	ymax = len(Board[0])
 	for x = 0; x <= xmax; x++ {
 		for y = 0; y <= ymax; y++ {
-			for s = 0; s < 4 && board[x][y] == curPlayer; s++ {
+			for s = 0; s < 4 && Board[x][y] == curPlayer; s++ {
 				ix, iy = x+i*(s/2+BoolToInt(s == 0)), y+i*(s%2-BoolToInt(s == 0))
-				for i = 0; ix >= 0 && iy >= 0 && ix < xmax && ymax < ymax && board[ix][iy] == curPlayer; i++ {
+				for i = 0; ix >= 0 && iy >= 0 && ix < xmax && ymax < ymax && Board[ix][iy] == curPlayer; i++ {
 					ix, iy = x+i*(s/2+BoolToInt(s == 0)), y+i*(s%2-BoolToInt(s == 0))
 				}
-				if ix >= 0 && iy >= 0 && ix < xmax && ymax < ymax && board[ix][iy] <= 0 && i > 1 {
-					AddUnauthorizedPawn(board, ix, iy, curPlayer, othPlayer)
+				if ix >= 0 && iy >= 0 && ix < xmax && ymax < ymax && Board[ix][iy] <= 0 && i > 1 {
+					AddUnauthorizedPawn(Board, ix, iy, curPlayer, othPlayer)
 				}
 				ix, iy = x-i*(s/2+BoolToInt(s == 0)), y-i*(s%2-BoolToInt(s == 0))
-				if ix >= 0 && iy >= 0 && ix < xmax && ymax < ymax && board[ix][iy] <= 0 && i > 1 {
-					AddUnauthorizedPawn(board, ix, iy, curPlayer, othPlayer)
+				if ix >= 0 && iy >= 0 && ix < xmax && ymax < ymax && Board[ix][iy] <= 0 && i > 1 {
+					AddUnauthorizedPawn(Board, ix, iy, curPlayer, othPlayer)
 				}
 			}
 		}
@@ -115,45 +115,45 @@ func AddUnauthorizedMove(board [][]int, curPlayer, othPlayer int) {
 }
 
 //	Add Unauthorized move value for current player
-func AddUnauthorizedPawn(board [][]int, x, y, curPlayer, othPlayer int) {
-	if board[x][y] == -1*othPlayer {
-		board[x][y] -= curPlayer
+func AddUnauthorizedPawn(Board [][]int, x, y, curPlayer, othPlayer int) {
+	if Board[x][y] == -1*othPlayer {
+		Board[x][y] -= curPlayer
 	} else {
-		board[x][y] = -1 * curPlayer
+		Board[x][y] = -1 * curPlayer
 	}
 }
 
 //	Let Threef free
-func AddAuthorizedThreef(board [][]int, cur Player) {
+func AddAuthorizedThreef(Board [][]int, cur Player) {
 	var x, y int
 	var xmax, ymax int
 	var i, j, lenThreef int
 
 	lenThreef = len(cur.threef)
-	xmax, ymax = len(board), len(board[0])
+	xmax, ymax = len(Board), len(Board[0])
 	for i = 0; i < lenThreef; i++ {
 		for j = 0; j < 5; j++ {
 			x = cur.threef[i].pos.x + j*(cur.threef[i].dir/2+BoolToInt(cur.threef[i].dir == 0))
 			y = cur.threef[i].pos.y + j*(cur.threef[i].dir%2-BoolToInt(cur.threef[i].dir == 0))
 			if x < 0 || x >= xmax || y < 0 || y >= ymax {
 				continue
-			} else if board[x][y] == -3 || board[x][y] == -1*cur.whoiam {
-				board[x][y] += cur.whoiam
+			} else if Board[x][y] == -3 || Board[x][y] == -1*cur.whoiam {
+				Board[x][y] += cur.whoiam
 			}
 		}
 	}
 }
 
 //	Add Authorized move value for current player
-func AddAuthorizedMove(board [][]int, player Player) {
+func AddAuthorizedMove(Board [][]int, player Player) {
 	var x, y int
 	var xmax, ymax int
 
-	xmax, ymax = len(board), len(board[0])
+	xmax, ymax = len(Board), len(Board[0])
 	for x = 0; x < xmax; x++ {
 		for y = 0; y < ymax; y++ {
-			if board[x][y] == -3 || board[x][y] == -1*player.whoiam {
-				board[x][y] += player.whoiam
+			if Board[x][y] == -3 || Board[x][y] == -1*player.whoiam {
+				Board[x][y] += player.whoiam
 			}
 		}
 	}
@@ -168,7 +168,7 @@ func CheckEatPawn(child GameData, pawn Pawns) {
 	for x = -3; x <= 3; x += 3 {
 		for y = -3; y <= 3; y += 3 {
 			px, py = pawn.x+x, pawn.y+y
-			if (px >= 0 || py >= 0 || px < len(child.board) || py < len(child.board[0])) && child.board[px][py] == child.turn && child.board[px-(x/3)][py-(y/3)] == otherPlayer && child.board[px-(2*x/3)][py-(2*y/3)] == otherPlayer {
+			if (px >= 0 || py >= 0 || px < len(child.Board) || py < len(child.Board[0])) && child.Board[px][py] == child.turn && child.Board[px-(x/3)][py-(y/3)] == otherPlayer && child.Board[px-(2*x/3)][py-(2*y/3)] == otherPlayer {
 				AddAteNumPlayer(child, px-(x/3), py-(y/3), px-(2*x/3), py-(2*y/3))
 				CheckAlignement(child, Pawns{
 					x: px - (x / 3),
@@ -183,20 +183,20 @@ func CheckEatPawn(child GameData, pawn Pawns) {
 		}
 	}
 	if child.turn != child.facundo.whoiam {
-		CheckAlignPawnPlayer(child.board, child.facundo)
+		CheckAlignPawnPlayer(child.Board, child.facundo)
 	} else if child.turn != child.human.whoiam {
-		CheckAlignPawnPlayer(child.board, child.human)
+		CheckAlignPawnPlayer(child.Board, child.human)
 	}
 }
 
 //	Check all Alignement of Pawn registered
-func CheckAlignPawnPlayer(board [][]int, player Player) {
+func CheckAlignPawnPlayer(Board [][]int, player Player) {
 	var lenThreef, i int
 	var dispo int
 
 	lenThreef = len(player.threef)
 	for i = 0; i < lenThreef; i++ {
-		dispo, _ = CheckAlignPawnLocal(board, player.threef[i], player.whoiam)
+		dispo, _ = CheckAlignPawnLocal(Board, player.threef[i], player.whoiam)
 		if dispo < 5 {
 			player.threef[i] = player.threef[len(player.threef)-1]
 			player.threef = player.threef[:len(player.threef)-1]
@@ -204,7 +204,7 @@ func CheckAlignPawnPlayer(board [][]int, player Player) {
 	}
 	lenThreef = len(player.five_w)
 	for i = 0; i < lenThreef; i++ {
-		dispo, _ = CheckAlignPawnLocal(board, player.five_w[i], player.whoiam)
+		dispo, _ = CheckAlignPawnLocal(Board, player.five_w[i], player.whoiam)
 		if dispo < 5 {
 			player.five_w[i] = player.five_w[len(player.five_w)-1]
 			player.five_w = player.five_w[:len(player.five_w)-1]
@@ -213,23 +213,23 @@ func CheckAlignPawnPlayer(board [][]int, player Player) {
 }
 
 //	Check Current Alignement of Pawn
-func CheckAlignPawnLocal(board [][]int, threef AlignP, whoiam int) (int, int) {
+func CheckAlignPawnLocal(Board [][]int, threef AlignP, whoiam int) (int, int) {
 	var x, y, n int
 	var dispo, align int
 
 	for dispo, align, n = 0, 0, 0; n < 5; n++ {
 		x = threef.pos.x + n*(threef.dir/2+BoolToInt(threef.dir == 0))
 		y = threef.pos.y + n*(threef.dir%2-BoolToInt(threef.dir == 0))
-		if x < 0 || y < 0 || x >= len(board) || y >= len(board[0]) || (board[x][y] != whoiam && board[x][y] > 0) {
+		if x < 0 || y < 0 || x >= len(Board) || y >= len(Board[0]) || (Board[x][y] != whoiam && Board[x][y] > 0) {
 			return 0, 0
-		} else if board[x][y] == whoiam {
+		} else if Board[x][y] == whoiam {
 			dispo++
 			align++
 		} else {
-			if board[x][y] <= 0 && align > 0 {
+			if Board[x][y] <= 0 && align > 0 {
 				dispo++
 			} else {
-				dispo = BoolToInt(board[x][y] <= 0)
+				dispo = BoolToInt(Board[x][y] <= 0)
 			}
 			align = 0
 		}
@@ -239,8 +239,8 @@ func CheckAlignPawnLocal(board [][]int, threef AlignP, whoiam int) (int, int) {
 
 //	Increase value of Pawn ate by player
 func AddAteNumPlayer(child GameData, x1, y1, x2, y2 int) {
-	child.board[x1][y1] = 0
-	child.board[x2][y2] = 0
+	child.Board[x1][y1] = 0
+	child.Board[x2][y2] = 0
 	if child.turn == child.facundo.whoiam {
 		child.facundo.atenum++
 	} else if child.turn == child.human.whoiam {
@@ -248,13 +248,13 @@ func AddAteNumPlayer(child GameData, x1, y1, x2, y2 int) {
 	}
 }
 
-//	Add pawn and new authorized place on board
+//	Add pawn and new authorized place on Board
 func AddPawnOnBoard(child GameData, pawn Pawns) {
-	child.board[pawn.x][pawn.y] = child.turn
+	child.Board[pawn.x][pawn.y] = child.turn
 	for x := -1; x < 2; x++ {
 		for y := -1; y < 2; y++ {
-			if child.board[pawn.x+x][pawn.y+y] == -4 {
-				child.board[pawn.x+x][pawn.y+y] = 0
+			if child.Board[pawn.x+x][pawn.y+y] == -4 {
+				child.Board[pawn.x+x][pawn.y+y] = 0
 			}
 		}
 	}

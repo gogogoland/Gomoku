@@ -25,7 +25,7 @@ func (heapList *PrioQueue) Push(toAdd interface{}) {
 	*heapList = append(*heapList, GameData{
 		facundo: toAdd.(GameData).facundo,
 		human:   toAdd.(GameData).human,
-		board:   toAdd.(GameData).board,
+		Board:   toAdd.(GameData).Board,
 		deep:    toAdd.(GameData).deep,
 		move:    toAdd.(GameData).move,
 		prob:    toAdd.(GameData).prob,

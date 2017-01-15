@@ -177,7 +177,7 @@ func GameDataInit(whobegin int) GameData {
 	return GameData{
 		facundo: PlayerInit(1),
 		human:   PlayerInit(2),
-		board:   BoardIntInit(19, 19, -4),
+		Board:   BoardIntInit(19, 19, -4),
 		deep:    0,
 		move:    PawnsInit(-1, -1),
 		prob:    0,
@@ -191,7 +191,7 @@ func GameDataCopy(tocopy /*, theone */ GameData) GameData {
 	return GameData{
 		facundo: PlayerCopy(tocopy.facundo),
 		human:   PlayerCopy(tocopy.human),
-		board:   BoardIntCopy(tocopy.board),
+		Board:   BoardIntCopy(tocopy.Board),
 		deep:    tocopy.deep,
 		move:    PawnsCopy(tocopy.move),
 		prob:    tocopy.prob,

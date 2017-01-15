@@ -14,10 +14,9 @@ import (
 	"github.com/google/gxui/samples/flags"
 )
 
-func appMain(driver gxui.Driver) {
-	
+func appMain(driver gxui.Driver) {	
 	//Path to your image
-	file := args[0]
+	file := "nop"
 
 	f, err := os.Open(file)
 	if err != nil {
