@@ -53,7 +53,7 @@ type Player struct {
 type GameData struct {
 	facundo, human Player
 	//salver is a better name, no ?
-	board  [][]int
+	Board  [][]int
 	deep   int
 	move   Pawns
 	prob   int

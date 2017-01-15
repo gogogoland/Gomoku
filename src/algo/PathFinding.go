@@ -168,7 +168,7 @@ func GetOptimalPath(queu *PrioQueue, Mom GameData, IA int, timeStart time.Time) 
 	timeSince := time.Since(timeStart)
 	fmt.Println("Time required: ", timeSince)
 
-	return Mom, FacundoMove.pawn_p, Mom.board
+	return Mom, FacundoMove.pawn_p, Mom.Board
 }
 
 //	Use of different IA
@@ -191,13 +191,13 @@ func GetPossiblePlace(gd GameData) []NextPawns {
 
 	i = 0
 	np_size = 0
-	xmax = len(gd.board)
-	ymax = len(gd.board[0])
+	xmax = len(gd.Board)
+	ymax = len(gd.Board[0])
 	authPlayer = GetOtherTurn(gd) * -1
 	//	Get number of childrens possible move
 	for curx = 0; curx < xmax; curx++ {
 		for cury = 0; cury < ymax; cury++ {
-			if gd.board[curx][cury] != 0 || gd.board[curx][cury] == authPlayer {
+			if gd.Board[curx][cury] != 0 || gd.Board[curx][cury] == authPlayer {
 				np_size++
 			}
 		}
@@ -208,7 +208,7 @@ func GetPossiblePlace(gd GameData) []NextPawns {
 	np = make([]NextPawns, np_size)
 	for curx = 0; curx < xmax; curx++ {
 		for cury = 0; cury < ymax; cury++ {
-			if gd.board[curx][cury] != 0 || gd.board[curx][cury] == authPlayer {
+			if gd.Board[curx][cury] != 0 || gd.Board[curx][cury] == authPlayer {
 				np[i] = NextPawnsInit(curx, cury, np_size, 0.0)
 				i++
 			}

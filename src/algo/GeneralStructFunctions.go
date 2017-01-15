@@ -108,23 +108,23 @@ func NextPawnsCopy(tocopy NextPawns) NextPawns {
  */
 
 func BoardIntInit(height, width, value int) [][]int {
-	var board [][]int
+	var Board [][]int
 
-	board = make([][]int, height)
+	Board = make([][]int, height)
 	for y := 0; y < height; y++ {
-		board[y] = make([]int, width)
+		Board[y] = make([]int, width)
 		for x := 0; x < width; x++ {
-			board[y][x] = value
+			Board[y][x] = value
 		}
 	}
 	/*
 	 * Beg Special rules
 	 */
-	board[height/2+height%2][width/2+width%2] = 0
+	Board[height/2+height%2][width/2+width%2] = 0
 	/*
 	 * End Special rules
 	 */
-	return board
+	return Board
 }
 
 func BoardIntCopy(tocopy [][]int) [][]int {
@@ -177,7 +177,7 @@ func GameDataInit(whobegin int) GameData {
 	return GameData{
 		facundo: PlayerInit(1),
 		human:   PlayerInit(2),
-		board:   BoardIntInit(19, 19, -4),
+		Board:   BoardIntInit(19, 19, -4),
 		deep:    0,
 		move:    PawnsInit(-1, -1),
 		prob:    0,
@@ -191,7 +191,7 @@ func GameDataCopy(tocopy /*, theone */ GameData) GameData {
 	return GameData{
 		facundo: PlayerCopy(tocopy.facundo),
 		human:   PlayerCopy(tocopy.human),
-		board:   BoardIntCopy(tocopy.board),
+		Board:   BoardIntCopy(tocopy.Board),
 		deep:    tocopy.deep,
 		move:    PawnsCopy(tocopy.move),
 		prob:    tocopy.prob,
