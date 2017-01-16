@@ -1,7 +1,6 @@
 package gui
 
 import (
-	"flag"
 	"fmt"
 	"image"
 	"image/draw"
@@ -14,7 +13,29 @@ import (
 	"github.com/google/gxui/samples/flags"
 )
 
-func appMain(driver gxui.Driver) {	
+
+/*
+** Little test for key usage with gxui
+*/
+
+func appMain(driver gxui.Driver){
+	theme := flags.CreateTheme(driver)
+
+	window := theme.CreateWindow(800, 600, "Open file...")
+	window.OnKeyDown(func(ev gxui.KeyboardEvent) {
+		if ev.Key == gxui.KeyEscape || ev.Key == gxui.KeyKpEnter {
+			fmt.Println("Close")
+			window.Close()
+		}
+	})
+	window.OnClose(driver.Terminate)
+}
+
+/*
+** I'm not using it for the moment.
+*/
+/*
+func appMain2(driver gxui.Driver) {
 	//Path to your image
 	file := "nop"
 
@@ -47,8 +68,8 @@ func appMain(driver gxui.Driver) {
 
 	window.OnClose(driver.Terminate)
 }
+*/
 
 func Test() {
-	flag.Parse()
 	gl.StartDriver(appMain)
 }
