@@ -2,11 +2,8 @@ package gui
 
 import (
 	"fmt"
-	"image"
-	"image/draw"
 	_ "image/jpeg"
 	_ "image/png"
-	"os"
 
 	"github.com/google/gxui"
 	"github.com/google/gxui/drivers/gl"
