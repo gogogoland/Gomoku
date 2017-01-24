@@ -20,7 +20,6 @@ library:
 	@if [ ! -d "$(PWD)/src/golang.org" ] && [ ! -d "$(PWD)/src/github.com" ];then \
 		echo "\033[1;36;m[Getting $@...]\033[0m "; \
 		go get -u github.com/google/gxui/...; \
-		go install github.com/google/gxui/samples/...; \
 	fi
 
 clean:
