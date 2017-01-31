@@ -28,7 +28,7 @@ func appMain(driver gxui.Driver){
 
 	window.OnClick(func(me gxui.MouseEvent) {
 		if me.Button == 0 {
-			fmt.Println("Clique de souris gauche detecte")
+			fmt.Println("Right Click.")
 		}
 	})
 
