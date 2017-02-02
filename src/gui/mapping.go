@@ -17,7 +17,7 @@ func MappingBoard() *List{
 
 	for x := 0; x < 19; x++{
 		for y := 0; y < 19; y++{
-			list.PushBack(Map{Px + 1 * x, Py + 1 * y, Px * x, Py * y})
+			list.PushBack(Map{(Px + 1) * x, (Py + 1) * y, Px * x, Py * y})
 		}
 	}
 	for e := list.Front(); e != nil; e = e.Next() {
