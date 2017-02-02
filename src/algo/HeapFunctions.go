@@ -29,6 +29,8 @@ func (heapList *PrioQueue) Push(toAdd interface{}) {
 		deep:    toAdd.(GameData).deep,
 		move:    toAdd.(GameData).move,
 		prob:    toAdd.(GameData).prob,
+		turn:    toAdd.(GameData).turn,
+		whowin:  toAdd.(GameData).whowin,
 	})
 }
 
@@ -73,11 +75,11 @@ func InitHeapList(gameData GameData, deepness int) *PrioQueue {
 	copy(five_f, gameData.facundo.five_w)
 	five_h = make([]AlignP, len(gameData.human.five_w))
 	copy(five_h, gameData.human.five_w)
-	max = len(gameData.Board)
+	max = len(gameData.board)
 	newBoard = make([][]int, max)
 	for i := 0; i < max; i++ {
-		newBoard[i] = make([]int, len(gameData.Board[i]))
-		copy(newBoard[i], gameData.Board[i])
+		newBoard[i] = make([]int, len(gameData.board[i]))
+		copy(newBoard[i], gameData.board[i])
 	}
 
 	return &PrioQueue{
@@ -98,7 +100,7 @@ func InitHeapList(gameData GameData, deepness int) *PrioQueue {
 				threef: gameData.human.threef,
 				winpot: gameData.human.winpot,
 			},
-			Board: newBoard,
+			board: newBoard,
 			deep:  deepness,
 			move:  PawnsInit(gameData.move.x, gameData.move.y),
 			prob:  gameData.prob,

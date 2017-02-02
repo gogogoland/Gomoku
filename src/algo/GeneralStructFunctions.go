@@ -34,16 +34,16 @@ func AlignPCompare(ap1, ap2 AlignP) bool {
 	return (PawnsCompare(ap1.pos, ap2.pos) && ap1.dir == ap2.dir)
 }
 
-func AlignPAdd(lst []AlignP, new AlignP) {
+func AlignPAdd(lst *([]AlignP), new AlignP) {
 	var cur, lenLst int
 
-	lenLst = len(lst)
+	lenLst = len(*lst)
 	for cur = 0; cur < lenLst; cur++ {
-		if AlignPCompare(lst[cur], new) {
+		if AlignPCompare((*lst)[cur], new) {
 			return
 		}
 	}
-	lst = append(lst, new)
+	*lst = append(*lst, new)
 }
 
 func AlignPCopy(tocopy AlignP) AlignP {
@@ -108,23 +108,23 @@ func NextPawnsCopy(tocopy NextPawns) NextPawns {
  */
 
 func BoardIntInit(height, width, value int) [][]int {
-	var Board [][]int
+	var board [][]int
 
-	Board = make([][]int, height)
+	board = make([][]int, height)
 	for y := 0; y < height; y++ {
-		Board[y] = make([]int, width)
+		board[y] = make([]int, width)
 		for x := 0; x < width; x++ {
-			Board[y][x] = value
+			board[y][x] = value
 		}
 	}
 	/*
 	 * Beg Special rules
 	 */
-	Board[height/2+height%2][width/2+width%2] = 0
+	board[height/2+height%2][width/2+width%2] = 0
 	/*
 	 * End Special rules
 	 */
-	return Board
+	return board
 }
 
 func BoardIntCopy(tocopy [][]int) [][]int {
@@ -136,6 +136,7 @@ func BoardIntCopy(tocopy [][]int) [][]int {
 	theone = make([][]int, ylen)
 	for y = 0; y < ylen; y++ {
 		xlen = len(tocopy[y])
+		theone[y] = make([]int, xlen)
 		for x = 0; x < xlen; x++ {
 			theone[y][x] = tocopy[y][x]
 		}
@@ -175,8 +176,8 @@ func PlayerCopy(tocopy Player) Player {
 
 func GameDataInit(whobegin int) GameData {
 	return GameData{
-		facundo: PlayerInit(1),
-		human:   PlayerInit(2),
+		facundo: PlayerInit(2),
+		human:   PlayerInit(1),
 		Board:   BoardIntInit(19, 19, -4),
 		deep:    0,
 		move:    PawnsInit(-1, -1),
