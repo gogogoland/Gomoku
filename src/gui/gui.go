@@ -11,19 +11,49 @@ import (
 
 	"github.com/google/gxui"
 	"github.com/google/gxui/drivers/gl"
+	"github.com/google/gxui/math"
 	"github.com/google/gxui/samples/flags"
 )
 
-
 var (
-	Title string = "Gomoku"
+	Title         string = "Gomoku"
+	width, height int    = 1024, 1024
 )
-/*
-** Little test for key usage with gxui
-*/
 
-func appMain(driver gxui.Driver){
-	//Path to Image 
+func drawStar(canvas gxui.Canvas, center math.Point, radius float32, points int, color gxui.Color) {
+	p := make(gxui.Polygon, points*2)
+	for i := 0; i < points*2; i++ {
+
+		frac := float32(i) / float32(points*2)
+		α := frac * math.TwoPi
+		r := []float32{radius, radius}[i&1]
+
+		p[i] = gxui.PolygonVertex{
+			Position: math.Point{
+				X: center.X + int(r*math.Cosf(α)),
+				Y: center.Y + int(r*math.Sinf(α)),
+			},
+			RoundedRadius: []float32{0, 50}[i&1],
+		}
+	}
+	canvas.DrawPolygon(p, gxui.CreatePen(1.25, gxui.Black), gxui.CreateBrush(color))
+}
+
+func DrawPawn(driver gxui.Driver, window gxui.Window, color gxui.Color, center math.Point) {
+	theme := flags.CreateTheme(driver)
+
+	canvas := driver.CreateCanvas(math.Size{W: width, H: height})
+	drawStar(canvas, center, 25, 38, gxui.White)
+
+	canvas.Complete()
+
+	image := theme.CreateImage()
+	image.SetCanvas(canvas)
+	window.AddChild(image)
+}
+
+func appMain(driver gxui.Driver) {
+	//Path to Image
 	file := "sprites/GoBoard.png"
 	f, err := os.Open(file)
 	if err != nil {
@@ -36,11 +66,10 @@ func appMain(driver gxui.Driver){
 		fmt.Printf("Failed to read image '%s': %v\n", file, err)
 		os.Exit(1)
 	}
-
 	theme := flags.CreateTheme(driver)
 	img := theme.CreateImage()
 
-	window := theme.CreateWindow(800, 800, Title)
+	window := theme.CreateWindow(height, width, Title)
 	window.SetScale(flags.DefaultScaleFactor)
 	window.AddChild(img)
 
@@ -55,6 +84,7 @@ func appMain(driver gxui.Driver){
 		if me.Button == 0 {
 			fmt.Println("Right Click.")
 			fmt.Println(me.WindowPoint)
+			DrawPawn(driver, window, gxui.White, me.WindowPoint)
 		}
 	})
 

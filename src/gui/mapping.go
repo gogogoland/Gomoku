@@ -1,22 +1,22 @@
 package gui
 
 import (
-	"fmt"
 	"container/list"
+	"fmt"
 )
 
 type Map struct {
 	PosX, PosY, PposX, PposY int
 }
 
-func MappingBoard() *List{
+func MappingBoard() *list.List {
 	//Init my list
 	list := list.New()
 
-	Px, Py := height / 19, width / 19
+	Px, Py := height/19, width/19
 
-	for x := 0; x < 19; x++{
-		for y := 0; y < 19; y++{
+	for x := 0; x < 19; x++ {
+		for y := 0; y < 19; y++ {
 			list.PushBack(Map{(Px + 1) * x, (Py + 1) * y, Px * x, Py * y})
 		}
 	}
