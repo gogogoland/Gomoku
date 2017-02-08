@@ -12,11 +12,14 @@
 
 package algo
 
+import "container/heap"
+
 /**
  * Function intern of GameData heaplist
  *
  * TODO:
  * 		Test comparaison
+ * 		NOTHING
 **/
 
 // Intern functions for HeapList
@@ -25,7 +28,7 @@ func (heapList *PrioQueue) Push(toAdd interface{}) {
 	*heapList = append(*heapList, GameData{
 		facundo: toAdd.(GameData).facundo,
 		human:   toAdd.(GameData).human,
-		Board:   toAdd.(GameData).Board,
+		board:   toAdd.(GameData).board,
 		deep:    toAdd.(GameData).deep,
 		move:    toAdd.(GameData).move,
 		prob:    toAdd.(GameData).prob,
@@ -62,48 +65,14 @@ func (heapList PrioQueue) Len() int {
 	return len(heapList)
 }
 
-// Extern functions
-//	*	Init HeapList
-func InitHeapList(gameData GameData, deepness int) *PrioQueue {
-	/*var five_f, five_h []AlignP
-	var newBoard [][]int
-	var max int*/
+// GameData dependent functions
+//	*	Init HeapList from GameData
+func (gameData GameData) InitHeapList(deepness int) *PrioQueue {
+	return &PrioQueue{gameData.Deep(deepness)}
+}
 
-	return &PrioQueue{GameDataDeep(gameData, deepness)}
-
-	/*five_f = make([]AlignP, len(gameData.facundo.five_w))
-	copy(five_f, gameData.facundo.five_w)
-	five_h = make([]AlignP, len(gameData.human.five_w))
-	copy(five_h, gameData.human.five_w)
-	max = len(gameData.board)
-	newBoard = make([][]int, max)
-	for i := 0; i < max; i++ {
-		newBoard[i] = make([]int, len(gameData.board[i]))
-		copy(newBoard[i], gameData.board[i])
-	}
-
-	return &PrioQueue{
-		GameData{
-			facundo: Player{
-				atenum: gameData.facundo.atenum,
-				whoiam: gameData.facundo.whoiam,
-				pawn_p: PawnsInit(gameData.facundo.pawn_p.x, gameData.facundo.pawn_p.y),
-				five_w: five_f,
-				threef: gameData.facundo.threef,
-				winpot: gameData.facundo.winpot,
-			},
-			human: Player{
-				atenum: gameData.human.atenum,
-				whoiam: gameData.human.whoiam,
-				pawn_p: PawnsInit(gameData.human.pawn_p.x, gameData.human.pawn_p.y),
-				five_w: five_h,
-				threef: gameData.human.threef,
-				winpot: gameData.human.winpot,
-			},
-			board: newBoard,
-			deep:  deepness,
-			move:  PawnsInit(gameData.move.x, gameData.move.y),
-			prob:  gameData.prob,
-		},
-	}*/
+//	*	Add to Heap List
+func (gameData GameData) AddGameDataToHeapList(list *PrioQueue) {
+	heap.Push(list, gameData)
+	heap.Fix(list, len(*list)-1)
 }

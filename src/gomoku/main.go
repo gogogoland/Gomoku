@@ -2,8 +2,8 @@
 package main
 
 import (
+	"gui"
 	"os"
-	"tempory_show"
 )
 
 /*
@@ -23,10 +23,10 @@ import (
  */
 
 func run() int {
+	gui.BasicDisplay(1)
 	return 0
 }
 
 func main() {
-	tempory_show.Example()
 	os.Exit(run())
 }

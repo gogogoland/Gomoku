@@ -33,27 +33,33 @@ type Pawns struct {
 	x, y int
 }
 
-//	*	Win Alignement
+//	*	Alignement of Pawns
 type AlignP struct {
 	pos Pawns
 	dir int
 }
+
+//	*	Slice of Alignement
+type SliceAP []AlignP
 
 //	*	Player data
 type Player struct {
 	atenum int
 	whoiam int
 	pawn_p Pawns
-	five_w []AlignP
-	threef []AlignP
+	five_w SliceAP
+	threef SliceAP
 	winpot float32
 }
+
+//	*	Board data
+type Board [][]int
 
 //	*	MinMax data
 type GameData struct {
 	facundo, human Player
 	//salver is a better name, no ?
-	Board  [][]int
+	board  Board
 	deep   int
 	move   Pawns
 	prob   int

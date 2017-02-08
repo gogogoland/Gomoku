@@ -30,40 +30,60 @@ func AlignPInit(x, y, dir int) AlignP {
 	}
 }
 
-func AlignPCompare(ap1, ap2 AlignP) bool {
-	return (PawnsCompare(ap1.pos, ap2.pos) && ap1.dir == ap2.dir)
+func (data AlignP) Compare(cmp AlignP) bool {
+	return (data.pos.Compare(cmp.GetPos()) && data.dir == cmp.GetDir())
 }
 
-func AlignPAdd(lst *([]AlignP), new AlignP) {
-	var cur, lenLst int
+func (data AlignP) Copy() AlignP {
+	return AlignP{
+		pos: data.pos.Copy(),
+		dir: data.dir,
+	}
+}
 
-	lenLst = len(*lst)
-	for cur = 0; cur < lenLst; cur++ {
-		if AlignPCompare((*lst)[cur], new) {
+/*
+ * Get functions for AlignP
+ */
+
+func (get AlignP) GetPos() Pawns {
+	return get.pos
+}
+
+func (get AlignP) GetDir() int {
+	return get.dir
+}
+
+/*
+ * For Slice of AlignP
+ */
+
+func (data *SliceAP) Add(new AlignP) {
+	var cur, lenSlice int
+
+	lenSlice = len(*data)
+	for cur = 0; cur < lenSlice; cur++ {
+		if (*data)[cur].Compare(new) {
 			return
 		}
 	}
-	*lst = append(*lst, new)
+	*data = append(*data, new)
 }
 
-func AlignPCopy(tocopy AlignP) AlignP {
-	return AlignP{
-		pos: PawnsCopy(tocopy.pos),
-		dir: tocopy.dir,
-	}
-}
-
-func AlignPSliceCopy(tocopy []AlignP) []AlignP {
-	var theone []AlignP
+func (data SliceAP) Copy() SliceAP {
+	var theone SliceAP
 	var lenAlP, curAlP int
 
-	lenAlP = len(tocopy)
-	theone = make([]AlignP, lenAlP)
+	lenAlP = len(data)
+	theone = make(SliceAP, lenAlP)
 	for curAlP = 0; curAlP < lenAlP; curAlP++ {
-		theone[curAlP] = AlignPCopy(tocopy[curAlP])
+		theone[curAlP] = data[curAlP].Copy()
 	}
 	return theone
 }
+
+/*
+ * End Functions for AlignP
+ */
 
 /*
  * Functions for Pawns structures
@@ -75,13 +95,29 @@ func PawnsInit(x, y int) Pawns {
 	}
 }
 
-func PawnsCompare(p1, p2 Pawns) bool {
-	return (p1.x == p2.x && p1.y == p2.y)
+func (data Pawns) Compare(cmp Pawns) bool {
+	return (data.x == cmp.GetX() && data.y == cmp.GetY())
 }
 
-func PawnsCopy(tocopy Pawns) Pawns {
-	return PawnsInit(tocopy.x, tocopy.y)
+func (data Pawns) Copy() Pawns {
+	return PawnsInit(data.x, data.y)
 }
+
+/*
+ * Get functions for Pawns
+ */
+
+func (get Pawns) GetX() int {
+	return get.x
+}
+
+func (get Pawns) GetY() int {
+	return get.y
+}
+
+/*
+ * End Functions for Pawns
+ */
 
 /*
  * Functions for NextPawns structures
@@ -95,20 +131,40 @@ func NextPawnsInit(x, y, test_n int, winpot float32) NextPawns {
 	}
 }
 
-func NextPawnsCopy(tocopy NextPawns) NextPawns {
+func (data NextPawns) Copy() NextPawns {
 	return NextPawns{
-		pawn_p: PawnsCopy(tocopy.pawn_p),
-		winpot: tocopy.winpot,
-		test_n: tocopy.test_n,
+		pawn_p: data.pawn_p.Copy(),
+		winpot: data.winpot,
+		test_n: data.test_n,
 	}
 }
+
+/*
+ * Get functions for NextPawns
+ */
+
+func (get NextPawns) GetPawn_P() Pawns {
+	return get.pawn_p
+}
+
+func (get NextPawns) GetWinPot() float32 {
+	return get.winpot
+}
+
+func (get NextPawns) GetTest_N() int {
+	return get.test_n
+}
+
+/*
+ * End Functions for NextPawns
+ */
 
 /*
  * Functions Board
  */
 
-func BoardIntInit(height, width, value int) [][]int {
-	var board [][]int
+func BoardIntInit(height, width, value int) Board {
+	var board Board
 
 	board = make([][]int, height)
 	for y := 0; y < height; y++ {
@@ -127,22 +183,26 @@ func BoardIntInit(height, width, value int) [][]int {
 	return board
 }
 
-func BoardIntCopy(tocopy [][]int) [][]int {
-	var theone [][]int
+func (data Board) Copy() Board {
+	var theone Board
 	var ylen, xlen int
 	var y, x int
 
-	ylen = len(tocopy)
+	ylen = len(data)
 	theone = make([][]int, ylen)
 	for y = 0; y < ylen; y++ {
-		xlen = len(tocopy[y])
+		xlen = len(data[y])
 		theone[y] = make([]int, xlen)
 		for x = 0; x < xlen; x++ {
-			theone[y][x] = tocopy[y][x]
+			theone[y][x] = data[y][x]
 		}
 	}
 	return theone
 }
+
+/*
+ * End Functions for Board
+ */
 
 /*
  * Functions for Player structures
@@ -159,16 +219,48 @@ func PlayerInit(whoareyou int) Player {
 	}
 }
 
-func PlayerCopy(tocopy Player) Player {
+func (data Player) Copy() Player {
 	return Player{
-		atenum: tocopy.atenum,
-		whoiam: tocopy.whoiam,
-		pawn_p: PawnsCopy(tocopy.pawn_p),
-		five_w: AlignPSliceCopy(tocopy.five_w),
-		threef: AlignPSliceCopy(tocopy.threef),
-		winpot: tocopy.winpot,
+		atenum: data.atenum,
+		whoiam: data.whoiam,
+		pawn_p: data.pawn_p.Copy(),
+		five_w: data.five_w.Copy(),
+		threef: data.threef.Copy(),
+		winpot: data.winpot,
 	}
 }
+
+/*
+ * Get functions for Player
+ */
+
+func (get Player) GetAteNum() int {
+	return get.atenum
+}
+
+func (get Player) GetWhoIAm() int {
+	return get.whoiam
+}
+
+func (get Player) GetPawn_P() Pawns {
+	return get.pawn_p
+}
+
+func (get Player) GetFive_W() SliceAP {
+	return get.five_w
+}
+
+func (get Player) GetThreeF() SliceAP {
+	return get.threef
+}
+
+func (get Player) GetWinPot() float32 {
+	return get.winpot
+}
+
+/*
+ * End Functions for Player
+ */
 
 /*
  * Functions for GameData structures
@@ -178,7 +270,7 @@ func GameDataInit(whobegin int) GameData {
 	return GameData{
 		facundo: PlayerInit(2),
 		human:   PlayerInit(1),
-		Board:   BoardIntInit(19, 19, -4),
+		board:   BoardIntInit(19, 19, -4),
 		deep:    0,
 		move:    PawnsInit(-1, -1),
 		prob:    0,
@@ -187,48 +279,90 @@ func GameDataInit(whobegin int) GameData {
 	}
 }
 
-func GameDataCopy(tocopy /*, theone */ GameData) GameData {
-	//theone = tocopy
+func (data GameData) Copy() GameData {
 	return GameData{
-		facundo: PlayerCopy(tocopy.facundo),
-		human:   PlayerCopy(tocopy.human),
-		Board:   BoardIntCopy(tocopy.Board),
-		deep:    tocopy.deep,
-		move:    PawnsCopy(tocopy.move),
-		prob:    tocopy.prob,
-		turn:    tocopy.turn,
-		whowin:  tocopy.whowin,
+		facundo: data.facundo.Copy(),
+		human:   data.human.Copy(),
+		board:   data.board.Copy(),
+		deep:    data.deep,
+		move:    data.move.Copy(),
+		prob:    data.prob,
+		turn:    data.turn,
+		whowin:  data.whowin,
 	}
 }
 
-func GameDataDeep(tocopy GameData, deepness int) GameData {
+func (data GameData) Deep(deepness int) GameData {
 	var theone GameData
 
-	theone = GameDataCopy(tocopy)
+	theone = data.Copy()
 	theone.deep = deepness
 	return theone
 }
 
-func GameDataGain(gain GameData) int {
-	gain.whowin = gain.facundo.whoiam * BoolToInt(gain.facundo.winpot >= 1.0)
-	gain.whowin += gain.human.whoiam * BoolToInt(gain.human.winpot >= 1.0)
-	return gain.whowin
+func (data GameData) Gain() int {
+	data.whowin = data.facundo.whoiam * BoolToInt(data.facundo.winpot >= 1.0)
+	data.whowin += data.human.whoiam * BoolToInt(data.human.winpot >= 1.0)
+	return data.whowin
 }
+
+/*
+ * Get function for GameData value
+ */
+
+func (get GameData) GetHuman() Player {
+	return get.human
+}
+
+func (get GameData) GetFacundo() Player {
+	return get.facundo
+}
+
+func (get GameData) GetPlayer(whoiam int) Player {
+	if get.human.whoiam == whoiam {
+		return get.GetHuman()
+	} else if get.facundo.whoiam == whoiam {
+		return get.GetFacundo()
+	}
+	return PlayerInit(whoiam)
+}
+
+func (get GameData) GetBoard() Board {
+	return get.board
+}
+
+func (get GameData) GetWhoWin() int {
+	return get.whowin
+}
+
+func (get GameData) GetMove() Pawns {
+	return get.move
+}
+
+func (get GameData) GetTurn() int {
+	return get.turn
+}
+
+func (get GameData) GetOtherTurn() int {
+	if get.turn == get.human.whoiam {
+		return get.facundo.whoiam
+	} else if get.turn == get.facundo.whoiam {
+		return get.human.whoiam
+	}
+	return 0
+}
+
+func (get GameData) GetProb() int {
+	return get.prob
+}
+
+/*
+ * End Functions for GameData
+ */
 
 /*
  * Other functions
  */
-func GetOtherTurn(gd GameData) int {
-	var newTurn int
-
-	if gd.turn == gd.human.whoiam {
-		newTurn = gd.facundo.whoiam
-	} else if gd.turn == gd.facundo.whoiam {
-		newTurn = gd.human.whoiam
-	}
-	return newTurn
-}
-
 func BoolToInt(b bool) int {
 	if b {
 		return 1
