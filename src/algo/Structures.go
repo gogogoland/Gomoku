@@ -60,6 +60,8 @@ type GameData struct {
 	facundo, human Player
 	//salver is a better name, no ?
 	board  Board
+	maxx   int
+	maxy   int
 	deep   int
 	move   Pawns
 	prob   int

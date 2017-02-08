@@ -45,11 +45,11 @@ func (data AlignP) Copy() AlignP {
  * Get functions for AlignP
  */
 
-func (get AlignP) GetPos() Pawns {
+func (get *AlignP) GetPos() Pawns {
 	return get.pos
 }
 
-func (get AlignP) GetDir() int {
+func (get *AlignP) GetDir() int {
 	return get.dir
 }
 
@@ -107,11 +107,11 @@ func (data Pawns) Copy() Pawns {
  * Get functions for Pawns
  */
 
-func (get Pawns) GetX() int {
+func (get *Pawns) GetX() int {
 	return get.x
 }
 
-func (get Pawns) GetY() int {
+func (get *Pawns) GetY() int {
 	return get.y
 }
 
@@ -143,15 +143,15 @@ func (data NextPawns) Copy() NextPawns {
  * Get functions for NextPawns
  */
 
-func (get NextPawns) GetPawn_P() Pawns {
+func (get *NextPawns) GetPawn_P() Pawns {
 	return get.pawn_p
 }
 
-func (get NextPawns) GetWinPot() float32 {
+func (get *NextPawns) GetWinPot() float32 {
 	return get.winpot
 }
 
-func (get NextPawns) GetTest_N() int {
+func (get *NextPawns) GetTest_N() int {
 	return get.test_n
 }
 
@@ -234,27 +234,27 @@ func (data Player) Copy() Player {
  * Get functions for Player
  */
 
-func (get Player) GetAteNum() int {
+func (get *Player) GetAteNum() int {
 	return get.atenum
 }
 
-func (get Player) GetWhoIAm() int {
+func (get *Player) GetWhoIAm() int {
 	return get.whoiam
 }
 
-func (get Player) GetPawn_P() Pawns {
+func (get *Player) GetPawn_P() Pawns {
 	return get.pawn_p
 }
 
-func (get Player) GetFive_W() SliceAP {
+func (get *Player) GetFive_W() SliceAP {
 	return get.five_w
 }
 
-func (get Player) GetThreeF() SliceAP {
+func (get *Player) GetThreeF() SliceAP {
 	return get.threef
 }
 
-func (get Player) GetWinPot() float32 {
+func (get *Player) GetWinPot() float32 {
 	return get.winpot
 }
 
@@ -271,6 +271,8 @@ func GameDataInit(whobegin int) GameData {
 		facundo: PlayerInit(2),
 		human:   PlayerInit(1),
 		board:   BoardIntInit(19, 19, -4),
+		maxx:    19,
+		maxy:    19,
 		deep:    0,
 		move:    PawnsInit(-1, -1),
 		prob:    0,
@@ -279,11 +281,13 @@ func GameDataInit(whobegin int) GameData {
 	}
 }
 
-func (data GameData) Copy() GameData {
+func (data *GameData) Copy() GameData {
 	return GameData{
 		facundo: data.facundo.Copy(),
 		human:   data.human.Copy(),
 		board:   data.board.Copy(),
+		maxx:    data.maxx,
+		maxy:    data.maxy,
 		deep:    data.deep,
 		move:    data.move.Copy(),
 		prob:    data.prob,
@@ -292,7 +296,7 @@ func (data GameData) Copy() GameData {
 	}
 }
 
-func (data GameData) Deep(deepness int) GameData {
+func (data *GameData) Deep(deepness int) GameData {
 	var theone GameData
 
 	theone = data.Copy()
@@ -300,7 +304,7 @@ func (data GameData) Deep(deepness int) GameData {
 	return theone
 }
 
-func (data GameData) Gain() int {
+func (data *GameData) Gain() int {
 	data.whowin = data.facundo.whoiam * BoolToInt(data.facundo.winpot >= 1.0)
 	data.whowin += data.human.whoiam * BoolToInt(data.human.winpot >= 1.0)
 	return data.whowin
@@ -310,15 +314,15 @@ func (data GameData) Gain() int {
  * Get function for GameData value
  */
 
-func (get GameData) GetHuman() Player {
+func (get *GameData) GetHuman() Player {
 	return get.human
 }
 
-func (get GameData) GetFacundo() Player {
+func (get *GameData) GetFacundo() Player {
 	return get.facundo
 }
 
-func (get GameData) GetPlayer(whoiam int) Player {
+func (get *GameData) GetPlayer(whoiam int) Player {
 	if get.human.whoiam == whoiam {
 		return get.GetHuman()
 	} else if get.facundo.whoiam == whoiam {
@@ -327,23 +331,31 @@ func (get GameData) GetPlayer(whoiam int) Player {
 	return PlayerInit(whoiam)
 }
 
-func (get GameData) GetBoard() Board {
+func (get *GameData) GetBoard() Board {
 	return get.board
 }
 
-func (get GameData) GetWhoWin() int {
+func (get *GameData) GetMaxX() int {
+	return get.maxx
+}
+
+func (get *GameData) GetMaxY() int {
+	return get.maxy
+}
+
+func (get *GameData) GetWhoWin() int {
 	return get.whowin
 }
 
-func (get GameData) GetMove() Pawns {
+func (get *GameData) GetMove() Pawns {
 	return get.move
 }
 
-func (get GameData) GetTurn() int {
+func (get *GameData) GetTurn() int {
 	return get.turn
 }
 
-func (get GameData) GetOtherTurn() int {
+func (get *GameData) GetOtherTurn() int {
 	if get.turn == get.human.whoiam {
 		return get.facundo.whoiam
 	} else if get.turn == get.facundo.whoiam {
@@ -352,7 +364,7 @@ func (get GameData) GetOtherTurn() int {
 	return 0
 }
 
-func (get GameData) GetProb() int {
+func (get *GameData) GetProb() int {
 	return get.prob
 }
 

@@ -30,6 +30,7 @@ func Play(whobegin int) {
 		for retry > 0 {
 			retry = GData.TurnProcess(Input())
 		}
+		fmt.Println("MAXX =", GData.GetMaxX(), "MAXY =", GData.GetMaxY())
 		GData.Pathfinding(3, 1)
 		PrintBoard(GData.GetBoard())
 	}
@@ -40,8 +41,10 @@ func PrintBoard(GameBoard [][]int) {
 		for x, xmax := 0, len(GameBoard[y]); x < xmax; x++ {
 			if GameBoard[y][x] >= 0 {
 				print("  ", GameBoard[y][x])
-			} else {
+			} else if GameBoard[y][x] != -4 {
 				print(" ", GameBoard[y][x])
+			} else if GameBoard[y][x] == -4 {
+				print("  .")
 			}
 		}
 		print("\n")

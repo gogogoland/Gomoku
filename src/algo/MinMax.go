@@ -26,7 +26,7 @@ func PrintHuman(popipo GameData) {
  *		Check unauthorized move left by diagonal ate move
  *		Change Permissive (freethree) Move for when the pawn is set
  *		Check space left between pawns
- * 		add win
+ *		See CheckEatPawn()
  *
  * 		NOTHING
 **/
@@ -34,18 +34,15 @@ func PrintHuman(popipo GameData) {
 //	Check if pawn are aligned (for winning move (if win and three free)
 func (child *GameData) CheckAlignement(pawn Pawns) {
 	var x, y, s int
-	var xmax, ymax int
 	var check, winAlign, limAlign, dispo int
 
 	winAlign, limAlign = 0, 0
-	xmax = len(child.board)
-	ymax = len(child.board[0])
 	for s = 0; s < 4 && winAlign < 5; s++ {
 		dispo, winAlign, limAlign = 0, 0, 0
 		for check = -4; check <= 4 && winAlign < 5; check++ {
 			x = pawn.x + check*(s/2+BoolToInt(s == 0))
 			y = pawn.y + check*(s%2-BoolToInt(s == 0))
-			if x < 0 || y < 0 || x >= xmax || y >= ymax {
+			if x < 0 || y < 0 || x >= child.maxx || y >= child.maxy {
 				continue
 			} else if child.board[x][y] == child.turn {
 				dispo++
@@ -84,13 +81,13 @@ func (child *GameData) CheckAlignement(pawn Pawns) {
 //	Put unauthorized and authorized move
 func (child *GameData) AddPermissiveMove() {
 	if len(child.facundo.threef) > 0 {
-		AddUnauthorizedMove(child.board, child.facundo.whoiam, child.human.whoiam)
+		child.AddUnauthorizedMove(child.facundo.whoiam, child.human.whoiam)
 		child.AddAuthorizedThreef(child.facundo)
 	} else {
 		child.AddAuthorizedMove(child.facundo.whoiam)
 	}
 	if len(child.human.threef) > 0 {
-		AddUnauthorizedMove(child.board, child.human.whoiam, child.facundo.whoiam)
+		child.AddUnauthorizedMove(child.human.whoiam, child.facundo.whoiam)
 		child.AddAuthorizedThreef(child.human)
 	} else {
 		child.AddAuthorizedMove(child.human.whoiam)
@@ -98,28 +95,25 @@ func (child *GameData) AddPermissiveMove() {
 }
 
 //	Add alls unauthorized move for player
-func AddUnauthorizedMove(Board [][]int, curPlayer, othPlayer int) {
-	var xmax, ymax int
+func (child *GameData) AddUnauthorizedMove(curPlayer, othPlayer int) {
 	var x, y int
 	var ix, iy int
 	var s int
 	var i int
 
-	xmax = len(Board)
-	ymax = len(Board[0])
-	for x = 0; x < xmax; x++ {
-		for y = 0; y < ymax; y++ {
-			for s = 0; s < 4 && Board[x][y] == curPlayer; s++ {
+	for x = 0; x < child.maxx; x++ {
+		for y = 0; y < child.maxy; y++ {
+			for s = 0; s < 4 && child.board[x][y] == curPlayer; s++ {
 				ix, iy = x+i*(s/2+BoolToInt(s == 0)), y+i*(s%2-BoolToInt(s == 0))
-				for i = 0; ix >= 0 && iy >= 0 && ix < xmax && ymax < ymax && Board[ix][iy] == curPlayer; i++ {
+				for i = 0; ix >= 0 && iy >= 0 && ix < child.maxx && child.maxy < child.maxy && child.board[ix][iy] == curPlayer; i++ {
 					ix, iy = x+i*(s/2+BoolToInt(s == 0)), y+i*(s%2-BoolToInt(s == 0))
 				}
-				if ix >= 0 && iy >= 0 && ix < xmax && ymax < ymax && Board[ix][iy] <= 0 && i > 1 {
-					AddUnauthorizedPawn(Board, ix, iy, curPlayer, othPlayer)
+				if ix >= 0 && iy >= 0 && ix < child.maxx && child.maxy < child.maxy && child.board[ix][iy] <= 0 && i > 1 {
+					child.AddUnauthorizedPawn(ix, iy, curPlayer, othPlayer)
 				}
 				ix, iy = x-i*(s/2+BoolToInt(s == 0)), y-i*(s%2-BoolToInt(s == 0))
-				if ix >= 0 && iy >= 0 && ix < xmax && ymax < ymax && Board[ix][iy] <= 0 && i > 1 {
-					AddUnauthorizedPawn(Board, ix, iy, curPlayer, othPlayer)
+				if ix >= 0 && iy >= 0 && ix < child.maxx && child.maxy < child.maxy && child.board[ix][iy] <= 0 && i > 1 {
+					child.AddUnauthorizedPawn(ix, iy, curPlayer, othPlayer)
 				}
 			}
 		}
@@ -127,25 +121,23 @@ func AddUnauthorizedMove(Board [][]int, curPlayer, othPlayer int) {
 }
 
 //	Add Unauthorized move value for current player
-func AddUnauthorizedPawn(Board [][]int, x, y, curPlayer, othPlayer int) {
-	if Board[x][y] == -1*othPlayer || Board[x][y] == 0 {
-		Board[x][y] -= curPlayer
+func (child *GameData) AddUnauthorizedPawn(x, y, curPlayer, othPlayer int) {
+	if child.board[x][y] == -1*othPlayer || child.board[x][y] == 0 {
+		child.board[x][y] -= curPlayer
 	}
 }
 
 //	Let Threef free
 func (child *GameData) AddAuthorizedThreef(player Player) {
 	var x, y int
-	var xmax, ymax int
 	var i, j, lenThreef int
 
 	lenThreef = len(player.threef)
-	xmax, ymax = len(child.board), len(child.board[0])
 	for i = 0; i < lenThreef; i++ {
 		for j = 0; j < 5; j++ {
 			x = player.threef[i].pos.x + j*(player.threef[i].dir/2+BoolToInt(player.threef[i].dir == 0))
 			y = player.threef[i].pos.y + j*(player.threef[i].dir%2-BoolToInt(player.threef[i].dir == 0))
-			if x < 0 || x >= xmax || y < 0 || y >= ymax {
+			if x < 0 || x >= child.maxx || y < 0 || y >= child.maxy {
 				continue
 			} else if child.board[x][y] == -3 || child.board[x][y] == -1*player.whoiam {
 				child.board[x][y] += player.whoiam
@@ -157,11 +149,9 @@ func (child *GameData) AddAuthorizedThreef(player Player) {
 //	Add Authorized move value for current player
 func (child *GameData) AddAuthorizedMove(whoiam int) {
 	var x, y int
-	var xmax, ymax int
 
-	xmax, ymax = len(child.board), len(child.board[0])
-	for x = 0; x < xmax; x++ {
-		for y = 0; y < ymax; y++ {
+	for x = 0; x < child.maxx; x++ {
+		for y = 0; y < child.maxy; y++ {
 			if child.board[x][y] == -1*whoiam || child.board[x][y] == -3 {
 				child.board[x][y] += whoiam
 			}
@@ -171,15 +161,14 @@ func (child *GameData) AddAuthorizedMove(whoiam int) {
 
 //	Check ate pawn (around player.Coord)
 func (child *GameData) CheckEatPawn(pawn Pawns) {
-	var x, y, px, py, maxx, maxy int
+	var x, y, px, py int
 	var otherPlayer int
 
 	otherPlayer = child.GetOtherTurn()
-	maxx, maxy = len(child.board), len(child.board[0])
 	for x = -3; x <= 3; x += 3 {
 		for y = -3; y <= 3; y += 3 {
 			px, py = pawn.x+x, pawn.y+y
-			if px >= 0 && py >= 0 && px < maxx && py < maxy && child.board[px][py] == child.turn && child.board[px-(x/3)][py-(y/3)] == otherPlayer && child.board[px-(2*x/3)][py-(2*y/3)] == otherPlayer {
+			if px >= 0 && py >= 0 && px < child.maxx && py < child.maxy && child.board[px][py] == child.turn && child.board[px-(x/3)][py-(y/3)] == otherPlayer && child.board[px-(2*x/3)][py-(2*y/3)] == otherPlayer {
 				child.AddAteNumPlayer(px-(x/3), py-(y/3), px-(2*x/3), py-(2*y/3))
 				child.CheckAlignement(Pawns{
 					x: px - (x / 3),
@@ -187,6 +176,9 @@ func (child *GameData) CheckEatPawn(pawn Pawns) {
 				child.CheckAlignement(Pawns{
 					x: px - (2 * x / 3),
 					y: py - (2 * y / 3)})
+				//child.DiagonalEatRemovePawn(pawn, Pawns{
+				//	x: px,
+				//	y: py})
 				//CheckUnauthorizetMove(child, Pawns{
 				//	x: pawn.x + (x % 2),
 				//	y: pawn.y + (y % 2)})
@@ -198,6 +190,36 @@ func (child *GameData) CheckEatPawn(pawn Pawns) {
 	} else if child.turn != child.human.whoiam {
 		child.human.CheckAlignPawnPlayer(child.board)
 	}
+}
+
+//	To RemoveUnabailbeMove for each four box around diagonal pawns ate
+//	TODO:
+//		Check diagonal unaivable box
+func (child *GameData) DiagonalEatRemovePawn(p1, p2 Pawns) {
+	if p2.x == 0 || p2.y == 0 {
+		return
+	}
+	child.RemoveUnavaibleMove(p1.x+1-BoolToInt(p1.x < p2.x)*2, p1.y)
+	child.RemoveUnavaibleMove(p1.x, p1.y)
+	child.RemoveUnavaibleMove(p2.x, p2.y)
+	child.RemoveUnavaibleMove(p2.x, p2.y)
+}
+
+//	Remove avaible box after diagonal ate
+func (child *GameData) RemoveUnavaibleMove(px, py int) {
+	var x, y int
+
+	if px < 0 || px >= child.maxx || py < 0 || py >= child.maxy {
+		return
+	}
+	for x = -1; x <= 1; x++ {
+		for y = -1; y <= 1; y++ {
+			if px+x >= 0 && px+x < child.maxx && py+y >= 0 && py+y < child.maxy && child.board[px+x][py+y] > 0 {
+				return
+			}
+		}
+	}
+	child.board[px][py] = -4
 }
 
 //	Check all Alignement of Pawn registered
@@ -295,7 +317,7 @@ func (child *GameData) AddPawnOnBoard(pawn Pawns) bool {
 
 //	Check probability (set prob of winning for two party)
 func (player *Player) CheckWinLose(turn int) {
-	if turn == player.whoiam && len(player.five_w) > 0 {
+	if turn != player.whoiam && len(player.five_w) > 0 {
 		// Check if already five aligned, if so it's a win
 		player.winpot = 1.0
 	} else {

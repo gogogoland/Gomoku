@@ -15,6 +15,7 @@ package algo
 import (
 	"container/heap"
 	"fmt"
+	"math/rand"
 	"runtime"
 	"time"
 )
@@ -62,7 +63,7 @@ func (Mom *GameData) Pathfinding(deepness, IA int) /*, Pawns, [][]int*/ {
 	//	Run A* for MinMax
 	for len(*open) > 0 {
 		childs = heap.Pop(open).(GameData)
-		childPawn = GetPossiblePlace(childs)
+		childPawn = childs.GetPossiblePlace()
 		childNum = len(childPawn)
 
 		for i := 0; i < childNum; i++ {
@@ -118,9 +119,9 @@ func (Mom *GameData) GetOptimalPath(queu *PrioQueue, IA int, timeStart time.Time
 	var childPawn []NextPawns
 	var childs GameData
 	var childPawnLen int
-	var i /*, randval*/ int
+	var i, randval int
 
-	childPawn = GetPossiblePlace(*Mom)
+	childPawn = Mom.GetPossiblePlace()
 	FacundoMove = NextPawnsInit(-1, -1, 0.0, 0)
 	childPawnLen = len(childPawn)
 	//	Get all childs from queu
@@ -140,13 +141,17 @@ func (Mom *GameData) GetOptimalPath(queu *PrioQueue, IA int, timeStart time.Time
 	}
 
 	//	Get best winpot for Facundo
+	random := rand.New(rand.NewSource(time.Now().UnixNano()))
 	for i = 0; i < childPawnLen; i++ {
 		fmt.Println("FacundoMove :", FacundoMove, "ChildPawn :", childPawn[i])
 		if FacundoMove.winpot < childPawn[i].winpot {
 			FacundoMove = childPawn[i].Copy()
+			randval = 1
 		} else if FacundoMove.winpot == childPawn[i].winpot {
-			/* ADD RANDOM */
-			FacundoMove = childPawn[i].Copy()
+			randval += 1
+			if random.Intn(randval) == randval-1 {
+				FacundoMove = childPawn[i].Copy()
+			}
 		}
 	}
 
@@ -165,7 +170,6 @@ func (Mom *GameData) GetOptimalPath(queu *PrioQueue, IA int, timeStart time.Time
 
 //	Use of different IA
 func (childs *GameData) UseOfIA(IA int) float32 {
-	return childs.facundo.winpot
 	return childs.facundo.winpot*(float32)(childs.prob) - childs.human.winpot*(float32)(childs.prob)
 	if IA == 1 {
 		return childs.facundo.winpot * (float32)(childs.prob)
@@ -176,19 +180,16 @@ func (childs *GameData) UseOfIA(IA int) float32 {
 }
 
 //	Get all avaible places for current player
-func GetPossiblePlace(gd GameData) []NextPawns {
+func (gd *GameData) GetPossiblePlace() []NextPawns {
 	var np []NextPawns
 	var curx, cury, i int
-	var xmax, ymax int
 	var np_size int
 
 	i = 0
 	np_size = 0
-	xmax = len(gd.board)
-	ymax = len(gd.board[0])
 	//	Get number of childrens possible move
-	for curx = 0; curx < xmax; curx++ {
-		for cury = 0; cury < ymax; cury++ {
+	for curx = 0; curx < gd.maxx; curx++ {
+		for cury = 0; cury < gd.maxy; cury++ {
 			if gd.board[curx][cury] == 0 || gd.board[curx][cury] == -1*gd.turn {
 				np_size++
 			}
@@ -198,8 +199,8 @@ func GetPossiblePlace(gd GameData) []NextPawns {
 	gd.prob = np_size
 	//	Set potential next pawns
 	np = make([]NextPawns, np_size)
-	for curx = 0; curx < xmax; curx++ {
-		for cury = 0; cury < ymax; cury++ {
+	for curx = 0; curx < gd.maxx; curx++ {
+		for cury = 0; cury < gd.maxy; cury++ {
 			if gd.board[curx][cury] == 0 || gd.board[curx][cury] == -1*gd.turn {
 				np[i] = NextPawnsInit(curx, cury, np_size, 0.0)
 				i++

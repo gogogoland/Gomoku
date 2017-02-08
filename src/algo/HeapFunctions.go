@@ -29,6 +29,8 @@ func (heapList *PrioQueue) Push(toAdd interface{}) {
 		facundo: toAdd.(GameData).facundo,
 		human:   toAdd.(GameData).human,
 		board:   toAdd.(GameData).board,
+		maxx:    toAdd.(GameData).maxx,
+		maxy:    toAdd.(GameData).maxy,
 		deep:    toAdd.(GameData).deep,
 		move:    toAdd.(GameData).move,
 		prob:    toAdd.(GameData).prob,
