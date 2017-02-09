@@ -26,7 +26,6 @@ func PrintHuman(popipo GameData) {
  *		Check unauthorized move left by diagonal ate move
  *		Change Permissive (freethree) Move for when the pawn is set
  *		Check space left between pawns
- *		See CheckEatPawn()
  *
  * 		NOTHING
 **/
@@ -176,9 +175,7 @@ func (child *GameData) CheckEatPawn(pawn Pawns) {
 				child.CheckAlignement(Pawns{
 					x: px - (2 * x / 3),
 					y: py - (2 * y / 3)})
-				//child.DiagonalEatRemovePawn(pawn, Pawns{
-				//	x: px,
-				//	y: py})
+				child.DiagonalEatRemovePawn(pawn, px, py)
 				//CheckUnauthorizetMove(child, Pawns{
 				//	x: pawn.x + (x % 2),
 				//	y: pawn.y + (y % 2)})
@@ -193,16 +190,16 @@ func (child *GameData) CheckEatPawn(pawn Pawns) {
 }
 
 //	To RemoveUnabailbeMove for each four box around diagonal pawns ate
-//	TODO:
-//		Check diagonal unaivable box
-func (child *GameData) DiagonalEatRemovePawn(p1, p2 Pawns) {
-	if p2.x == 0 || p2.y == 0 {
+func (child *GameData) DiagonalEatRemovePawn(p Pawns, x, y int) {
+	if x == 0 || y == 0 {
 		return
 	}
-	child.RemoveUnavaibleMove(p1.x+1-BoolToInt(p1.x < p2.x)*2, p1.y)
-	child.RemoveUnavaibleMove(p1.x, p1.y)
-	child.RemoveUnavaibleMove(p2.x, p2.y)
-	child.RemoveUnavaibleMove(p2.x, p2.y)
+	child.RemoveUnavaibleMove(p.x+2-BoolToInt(p.x > x)*4, p.y)
+	child.RemoveUnavaibleMove(p.x, p.y+2-BoolToInt(p.y > y)*4)
+	child.RemoveUnavaibleMove(p.x+1-BoolToInt(p.x > x)*2, p.y+2-BoolToInt(p.y > y)*4)
+	child.RemoveUnavaibleMove(x+1-BoolToInt(x > p.x)*2, y+2-BoolToInt(y > p.y)*4)
+	child.RemoveUnavaibleMove(x+2-BoolToInt(x > p.x)*4, y)
+	child.RemoveUnavaibleMove(x, y+2-BoolToInt(y > p.y)*4)
 }
 
 //	Remove avaible box after diagonal ate

@@ -368,6 +368,23 @@ func (get *GameData) GetProb() int {
 	return get.prob
 }
 
+func (get *GameData) PrintBoard() {
+	var x, y int
+
+	for y = 0; y < get.maxy; y++ {
+		for x = 0; x < get.maxx; x++ {
+			if get.board[y][x] >= 0 {
+				print("  ", get.board[y][x])
+			} else if get.board[y][x] != -4 {
+				print(" ", get.board[y][x])
+			} else if get.board[y][x] == -4 {
+				print("  .")
+			}
+		}
+		print("\n")
+	}
+}
+
 /*
  * End Functions for GameData
  */
