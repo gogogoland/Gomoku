@@ -19,47 +19,55 @@ func BasicDisplay(whobegin int) {
 	Play(whobegin)
 }
 
+//Remove void data in slice
+func DeleteElemFromSliceOfString(str []string, del string) []string {
+	var ret []string
+	var cur string
+
+	for _, cur = range str {
+		if cur != del {
+			ret = append(ret, cur)
+		}
+	}
+	return ret
+}
+
 //Play until GameDataGain != 0
 func Play(whobegin int) {
 	var retry int
 
 	GData := algo.GameDataInit(whobegin)
-	PrintBoard(GData.GetBoard())
+	GData.PrintBoard()
 	for GData.Gain() == 0 {
 		retry = 1
 		for retry > 0 {
 			retry = GData.TurnProcess(Input())
 		}
-		fmt.Println("MAXX =", GData.GetMaxX(), "MAXY =", GData.GetMaxY())
+		GData.PrintBoard()
+		fmt.Println(*(GData.GetHuman()))
 		GData.Pathfinding(3, 1)
-		PrintBoard(GData.GetBoard())
-	}
-}
-
-func PrintBoard(GameBoard [][]int) {
-	for y, ymax := 0, len(GameBoard); y < ymax; y++ {
-		for x, xmax := 0, len(GameBoard[y]); x < xmax; x++ {
-			if GameBoard[y][x] >= 0 {
-				print("  ", GameBoard[y][x])
-			} else if GameBoard[y][x] != -4 {
-				print(" ", GameBoard[y][x])
-			} else if GameBoard[y][x] == -4 {
-				print("  .")
-			}
-		}
-		print("\n")
+		GData.PrintBoard()
 	}
 }
 
 //Wait for player input X and Y and return a Pawns Struct from algo pkg
 func Input() algo.Pawns {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Enter X Y value: ")
-	text, _ := reader.ReadString('\n')
+	var getValue []string
+	var i, nbrValue int
 
-	text = strings.Replace(text, "\n", "", -1)
-	getValue := strings.Split(text, " ")
-	fmt.Println(getValue)
+	reader := bufio.NewReader(os.Stdin)
+	for getValue = nil; getValue == nil || len(getValue) != 2; {
+		fmt.Print("Enter X Y value: ")
+		text, _ := reader.ReadString('\n')
+
+		text = strings.Replace(text, "\n", "", -1)
+		getValue = strings.Split(text, " ")
+		getValue = DeleteElemFromSliceOfString(getValue, "")
+		for nbrValue, i = len(getValue), 0; i < nbrValue; i++ {
+			print("\"", getValue[i], "\" ")
+		}
+		print("\n")
+	}
 
 	X, _ := strconv.Atoi(getValue[0])
 	Y, _ := strconv.Atoi(getValue[1])

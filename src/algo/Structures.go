@@ -48,7 +48,11 @@ type Player struct {
 	whoiam int
 	pawn_p Pawns
 	five_w SliceAP
+	four_w SliceAP
 	threef SliceAP
+	tofree SliceAP
+	four_p SliceAP
+	threep SliceAP
 	winpot float32
 }
 

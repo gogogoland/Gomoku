@@ -219,7 +219,7 @@ func PlayerInit(whoareyou int) Player {
 	}
 }
 
-func (data Player) Copy() Player {
+func (data *Player) Copy() Player {
 	return Player{
 		atenum: data.atenum,
 		whoiam: data.whoiam,
@@ -250,8 +250,24 @@ func (get *Player) GetFive_W() SliceAP {
 	return get.five_w
 }
 
+func (get *Player) GetFour_W() SliceAP {
+	return get.four_w
+}
+
 func (get *Player) GetThreeF() SliceAP {
 	return get.threef
+}
+
+func (get *Player) GetToFree() SliceAP {
+	return get.tofree
+}
+
+func (get *Player) GetFour_P() SliceAP {
+	return get.four_p
+}
+
+func (get *Player) GetThreeP() SliceAP {
+	return get.threep
 }
 
 func (get *Player) GetWinPot() float32 {
@@ -314,21 +330,21 @@ func (data *GameData) Gain() int {
  * Get function for GameData value
  */
 
-func (get *GameData) GetHuman() Player {
-	return get.human
+func (get *GameData) GetHuman() *Player {
+	return &get.human
 }
 
-func (get *GameData) GetFacundo() Player {
-	return get.facundo
+func (get *GameData) GetFacundo() *Player {
+	return &get.facundo
 }
 
-func (get *GameData) GetPlayer(whoiam int) Player {
+func (get *GameData) GetPlayer(whoiam int) *Player {
 	if get.human.whoiam == whoiam {
 		return get.GetHuman()
 	} else if get.facundo.whoiam == whoiam {
 		return get.GetFacundo()
 	}
-	return PlayerInit(whoiam)
+	return nil
 }
 
 func (get *GameData) GetBoard() Board {

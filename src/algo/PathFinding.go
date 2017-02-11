@@ -87,8 +87,10 @@ func (Mom *GameData) Pathfinding(deepness, IA int) /*, Pawns, [][]int*/ {
 			//	Add to open's queu current child
 			//AddGameDataToHeapList(open, childs)//GOLD
 			if childo.deep != 0 && childo.facundo.winpot < 1.0 && childo.human.winpot < 1.0 {
+				fmt.Println("Pawn : ", childo.move, "Add to open list.")
 				childo.AddGameDataToHeapList(open)
 			} else {
+				fmt.Println("Pawn : ", childo.move, "Add to clos list.")
 				childo.AddGameDataToHeapList(clos)
 			}
 			//	In case of victory, go after it
@@ -96,13 +98,13 @@ func (Mom *GameData) Pathfinding(deepness, IA int) /*, Pawns, [][]int*/ {
 			 * 	!Get Best Path!
 			 * 	!OR ADD close queu!
 			 */
-			if /* childs.human.winpot >= 1.0 || */ childo.facundo.winpot >= 1.0 /* || childs.deep == 0 */ {
-				/*return*/ Mom.GetOptimalPath(clos, IA, timeStart)
-				return
-			}
+			//if /* childs.human.winpot >= 1.0 || */ childo.facundo.winpot >= 1.0 /* || childs.deep == 0 */ {
+			//	Mom.GetOptimalPath(clos, IA, timeStart)
+			//	return
+			//}
 		}
 	}
-	/*return*/ Mom.GetOptimalPath(clos, IA, timeStart)
+	Mom.GetOptimalPath(clos, IA, timeStart)
 }
 
 //	Get greater probability by low deepness
@@ -170,6 +172,7 @@ func (Mom *GameData) GetOptimalPath(queu *PrioQueue, IA int, timeStart time.Time
 
 //	Use of different IA
 func (childs *GameData) UseOfIA(IA int) float32 {
+	//return 0 - childs.human.winpot*(float32)(childs.prob)
 	return childs.facundo.winpot*(float32)(childs.prob) - childs.human.winpot*(float32)(childs.prob)
 	if IA == 1 {
 		return childs.facundo.winpot * (float32)(childs.prob)

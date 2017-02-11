@@ -23,8 +23,8 @@ func PrintHuman(popipo GameData) {
  *
  * TODO:
  * 		Seek comments inside functions
- *		Check unauthorized move left by diagonal ate move
  *		Change Permissive (freethree) Move for when the pawn is set
+ * 			-> Maybe add two and four pawn alignement
  *		Check space left between pawns
  *
  * 		NOTHING
@@ -39,6 +39,8 @@ func (child *GameData) CheckAlignement(pawn Pawns) {
 	for s = 0; s < 4 && winAlign < 5; s++ {
 		dispo, winAlign, limAlign = 0, 0, 0
 		for check = -4; check <= 4 && winAlign < 5; check++ {
+
+			//	Check current pawn
 			x = pawn.x + check*(s/2+BoolToInt(s == 0))
 			y = pawn.y + check*(s%2-BoolToInt(s == 0))
 			if x < 0 || y < 0 || x >= child.maxx || y >= child.maxy {
@@ -56,22 +58,16 @@ func (child *GameData) CheckAlignement(pawn Pawns) {
 				}
 				winAlign = 0
 			}
-			//	Maybe dispo == 6
+
+			//	Add to correct sliceAP foud alignement
+			//if check >= 0 && limAlign == 2 && dispo == 4 {
+			//	child.GetPlayer(child.turn)..Add(AlignPInit(x-(limAlign+1)*(s/2+BoolToInt(s == 0)), y-(limAlign+1)*(s%2-BoolToInt(s == 0)), s))
+			//}
 			if limAlign >= 3 && dispo == 5 {
-				if child.turn == child.facundo.whoiam {
-					child.facundo.threef.Add(AlignPInit(x-(limAlign+1)*(s/2+BoolToInt(s == 0)), y-(limAlign+1)*(s%2-BoolToInt(s == 0)), s))
-				} else if child.turn == child.human.whoiam {
-					child.human.threef.Add(AlignPInit(x-(limAlign+1)*(s/2+BoolToInt(s == 0)), y-(limAlign+1)*(s%2-BoolToInt(s == 0)), s))
-				}
+				child.GetPlayer(child.turn).threef.Add(AlignPInit(x-(limAlign+1)*(s/2+BoolToInt(s == 0)), y-(limAlign+1)*(s%2-BoolToInt(s == 0)), s))
 			}
 			if winAlign == 5 {
-				if child.turn == child.facundo.whoiam {
-					child.facundo.winpot += (1.0 - child.facundo.winpot) * (0.8 * BoolToFloat32(len(child.facundo.five_w) > 0))
-					child.facundo.five_w.Add(AlignPInit(x-winAlign*(s/2+BoolToInt(s == 0)), y-winAlign*(s%2-BoolToInt(s == 0)), s))
-				} else if child.turn == child.human.whoiam {
-					child.human.winpot += (1.0 - child.human.winpot) * (0.8 * BoolToFloat32(len(child.human.five_w) > 0))
-					child.human.five_w.Add(AlignPInit(x-winAlign*(s/2+BoolToInt(s == 0)), y-winAlign*(s%2-BoolToInt(s == 0)), s))
-				}
+				child.GetPlayer(child.turn).five_w.Add(AlignPInit(x-(winAlign-1)*(s/2+BoolToInt(s == 0)), y-(winAlign-1)*(s%2-BoolToInt(s == 0)), s))
 			}
 		}
 	}
