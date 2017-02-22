@@ -1,27 +1,14 @@
 package gui
 
 import (
-	"container/list"
 	"fmt"
 )
 
-type Map struct {
-	PosX, PosY, PposX, PposY int
-}
+func PlacePawn(cp math.Point) math.Point{
+	ValX := (cp.X - InitX) / 19
+	ValY := (cp.Y - InitY) / 19
+	if (ValX > ) {
 
-func MappingBoard() *list.List {
-	//Init my list
-	list := list.New()
-
-	Px, Py := height/19, width/19
-
-	for x := 0; x < 19; x++ {
-		for y := 0; y < 19; y++ {
-			list.PushBack(Map{(Px + 1) * x, (Py + 1) * y, Px * x, Py * y})
-		}
 	}
-	for e := list.Front(); e != nil; e = e.Next() {
-		fmt.Println(e.Value)
-	}
-	return list
+	return(math.Point{1,2})
 }

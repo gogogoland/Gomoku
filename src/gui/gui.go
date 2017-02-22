@@ -18,39 +18,8 @@ import (
 var (
 	Title         string = "Gomoku"
 	width, height int    = 1024, 1024
+	InitX, InitY int = 52, 38
 )
-
-func drawStar(canvas gxui.Canvas, center math.Point, radius float32, points int, color gxui.Color) {
-	p := make(gxui.Polygon, points*2)
-	for i := 0; i < points*2; i++ {
-
-		frac := float32(i) / float32(points*2)
-		α := frac * math.TwoPi
-		r := []float32{radius, radius}[i&1]
-
-		p[i] = gxui.PolygonVertex{
-			Position: math.Point{
-				X: center.X + int(r*math.Cosf(α)),
-				Y: center.Y + int(r*math.Sinf(α)),
-			},
-			RoundedRadius: []float32{0, 50}[i&1],
-		}
-	}
-	canvas.DrawPolygon(p, gxui.CreatePen(1.25, gxui.Black), gxui.CreateBrush(color))
-}
-
-func DrawPawn(driver gxui.Driver, window gxui.Window, color gxui.Color, center math.Point) {
-	theme := flags.CreateTheme(driver)
-
-	canvas := driver.CreateCanvas(math.Size{W: width, H: height})
-	drawStar(canvas, center, 25, 38, gxui.White)
-
-	canvas.Complete()
-
-	image := theme.CreateImage()
-	image.SetCanvas(canvas)
-	window.AddChild(image)
-}
 
 func appMain(driver gxui.Driver) {
 	//Path to Image
@@ -84,7 +53,8 @@ func appMain(driver gxui.Driver) {
 		if me.Button == 0 {
 			fmt.Println("Right Click.")
 			fmt.Println(me.WindowPoint)
-			DrawPawn(driver, window, gxui.White, me.WindowPoint)
+			DrawPawn(driver, window, gxui.White, math.Point{52, 38})
+			DrawPawn(driver, window, gxui.Black, math.Point{52 + width/19 , 38})
 		}
 	})
 
