@@ -49,12 +49,13 @@ func appMain(driver gxui.Driver) {
 		}
 	})
 
+	list := Debug()
+
 	window.OnClick(func(me gxui.MouseEvent) {
 		if me.Button == 0 {
-			fmt.Println("Right Click.")
 			fmt.Println(me.WindowPoint)
+			getClickPosInTab(list, me.WindowPoint)
 			DrawPawn(driver, window, gxui.White, math.Point{52, 38})
-			DrawPawn(driver, window, gxui.Black, math.Point{52 + width/19 , 38})
 		}
 	})
 
