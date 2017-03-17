@@ -11,17 +11,17 @@ import (
 
 	"github.com/google/gxui"
 	"github.com/google/gxui/drivers/gl"
-	"github.com/google/gxui/math"
 	"github.com/google/gxui/samples/flags"
 )
 
+
 var (
-	Title         string = "Gomoku"
+	title         string = "Gomoku"
 	width, height int    = 1024, 1024
-	InitX, InitY int = 52, 38
 )
 
 func appMain(driver gxui.Driver) {
+
 	//Path to Image
 	file := "sprites/GoBoard.png"
 	f, err := os.Open(file)
@@ -38,26 +38,11 @@ func appMain(driver gxui.Driver) {
 	theme := flags.CreateTheme(driver)
 	img := theme.CreateImage()
 
-	window := theme.CreateWindow(height, width, Title)
+	window := theme.CreateWindow(height, width, title)
 	window.SetScale(flags.DefaultScaleFactor)
 	window.AddChild(img)
 
-	window.OnKeyDown(func(ev gxui.KeyboardEvent) {
-		if ev.Key == gxui.KeyEscape || ev.Key == gxui.KeyKpEnter {
-			fmt.Println("Close")
-			window.Close()
-		}
-	})
-
-	list := Debug()
-
-	window.OnClick(func(me gxui.MouseEvent) {
-		if me.Button == 0 {
-			fmt.Println(me.WindowPoint)
-			getClickPosInTab(list, me.WindowPoint)
-			DrawPawn(driver, window, gxui.White, math.Point{52, 38})
-		}
-	})
+	Event(driver, window)
 
 	// Copy the image to a RGBA format before handing to a gxui.Texture
 	rgba := image.NewRGBA(source.Bounds())
