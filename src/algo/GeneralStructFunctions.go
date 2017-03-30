@@ -20,9 +20,9 @@ package algo
  * 		NOTHING
 **/
 
-/*
- * Functions for AlignP structures
- */
+/**
+ * 	Functions for AlignP structures
+**/
 func AlignPInit(x, y, dir int) AlignP {
 	return AlignP{
 		pos: PawnsInit(x, y),
@@ -41,9 +41,9 @@ func (data AlignP) Copy() AlignP {
 	}
 }
 
-/*
- * Get functions for AlignP
- */
+/**
+ * 	Get functions for AlignP
+**/
 
 func (get *AlignP) GetPos() Pawns {
 	return get.pos
@@ -53,9 +53,9 @@ func (get *AlignP) GetDir() int {
 	return get.dir
 }
 
-/*
- * For Slice of AlignP
- */
+/**
+ * 	For Slice of AlignP
+**/
 
 func (data *SliceAP) Add(new AlignP) {
 	var cur, lenSlice int
@@ -81,13 +81,13 @@ func (data SliceAP) Copy() SliceAP {
 	return theone
 }
 
-/*
- * End Functions for AlignP
- */
+/**
+ * 	End Functions for AlignP
+**/
 
-/*
- * Functions for Pawns structures
- */
+/**
+ * 	Functions for Pawns structures
+**/
 func PawnsInit(x, y int) Pawns {
 	return Pawns{
 		x: x,
@@ -103,9 +103,9 @@ func (data Pawns) Copy() Pawns {
 	return PawnsInit(data.x, data.y)
 }
 
-/*
- * Get functions for Pawns
- */
+/**
+ * 	Get functions for Pawns
+**/
 
 func (get *Pawns) GetX() int {
 	return get.x
@@ -115,13 +115,13 @@ func (get *Pawns) GetY() int {
 	return get.y
 }
 
-/*
- * End Functions for Pawns
- */
+/**
+ * 	End Functions for Pawns
+**/
 
-/*
- * Functions for NextPawns structures
- */
+/**
+ * 	Functions for NextPawns structures
+**/
 
 func NextPawnsInit(x, y, test_n int, winpot float32) NextPawns {
 	return NextPawns{
@@ -139,9 +139,9 @@ func (data NextPawns) Copy() NextPawns {
 	}
 }
 
-/*
- * Get functions for NextPawns
- */
+/**
+ * 	Get functions for NextPawns
+**/
 
 func (get *NextPawns) GetPawn_P() Pawns {
 	return get.pawn_p
@@ -155,13 +155,13 @@ func (get *NextPawns) GetTest_N() int {
 	return get.test_n
 }
 
-/*
- * End Functions for NextPawns
- */
+/**
+ * 	End Functions for NextPawns
+**/
 
-/*
- * Functions Board
- */
+/**
+ * 	Functions Board
+**/
 
 func BoardIntInit(height, width, value int) Board {
 	var board Board
@@ -173,13 +173,9 @@ func BoardIntInit(height, width, value int) Board {
 			board[y][x] = value
 		}
 	}
-	/*
-	 * Beg Special rules
-	 */
+	//Beg Special rules
 	board[height/2+height%2][width/2+width%2] = 0
-	/*
-	 * End Special rules
-	 */
+	//End Special rules
 	return board
 }
 
@@ -200,13 +196,13 @@ func (data Board) Copy() Board {
 	return theone
 }
 
-/*
- * End Functions for Board
- */
+/**
+ * 	End Functions for Board
+**/
 
-/*
- * Functions for Player structures
- */
+/**
+ * 	Functions for Player structures
+**/
 
 func PlayerInit(whoareyou int) Player {
 	return Player{
@@ -230,9 +226,9 @@ func (data *Player) Copy() Player {
 	}
 }
 
-/*
- * Get functions for Player
- */
+/**
+ * 	Get functions for Player
+**/
 
 func (get *Player) GetAteNum() int {
 	return get.atenum
@@ -250,37 +246,37 @@ func (get *Player) GetFive_W() SliceAP {
 	return get.five_w
 }
 
-func (get *Player) GetFour_W() SliceAP {
-	return get.four_w
-}
+//func (get *Player) GetFour_W() SliceAP {
+//	return get.four_w
+//}
 
 func (get *Player) GetThreeF() SliceAP {
 	return get.threef
 }
 
-func (get *Player) GetToFree() SliceAP {
-	return get.tofree
-}
+//func (get *Player) GetToFree() SliceAP {
+//	return get.tofree
+//}
 
-func (get *Player) GetFour_P() SliceAP {
-	return get.four_p
-}
+//func (get *Player) GetFour_P() SliceAP {
+//	return get.four_p
+//}
 
-func (get *Player) GetThreeP() SliceAP {
-	return get.threep
-}
+//func (get *Player) GetThreeP() SliceAP {
+//	return get.threep
+//}
 
 func (get *Player) GetWinPot() float32 {
 	return get.winpot
 }
 
-/*
- * End Functions for Player
- */
+/**
+ * 	End Functions for Player
+**/
 
-/*
- * Functions for GameData structures
- */
+/**
+ * 	Functions for GameData structures
+**/
 
 func GameDataInit(whobegin int) GameData {
 	return GameData{
@@ -326,9 +322,9 @@ func (data *GameData) Gain() int {
 	return data.whowin
 }
 
-/*
- * Get function for GameData value
- */
+/**
+ * 	Get function for GameData value
+**/
 
 func (get *GameData) GetHuman() *Player {
 	return &get.human
@@ -401,13 +397,13 @@ func (get *GameData) PrintBoard() {
 	}
 }
 
-/*
- * End Functions for GameData
- */
+/**
+ * 	End Functions for GameData
+**/
 
-/*
- * Other functions
- */
+/**
+ * 	Other functions
+**/
 func BoolToInt(b bool) int {
 	if b {
 		return 1

@@ -19,14 +19,6 @@ package algo
  * 		NOTHING
 **/
 
-//import (
-//	"container/heap"
-//	"container/list"
-//	"fmt"
-//	/*"github.com/samuel/gop-opencl/cl"*/
-//	"math"
-//)
-
 //	Structures
 //	*	Position of Pawns
 type Pawns struct {
@@ -48,11 +40,11 @@ type Player struct {
 	whoiam int
 	pawn_p Pawns
 	five_w SliceAP
-	four_w SliceAP
+	//four_w SliceAP
 	threef SliceAP
-	tofree SliceAP
-	four_p SliceAP
-	threep SliceAP
+	//tofree SliceAP
+	//four_p SliceAP
+	//threep SliceAP
 	winpot float32
 }
 
