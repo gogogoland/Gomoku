@@ -1,36 +1,27 @@
 package gui
 
 import(
-	"github.com/google/gxui/math"
 	"github.com/google/gxui"
 	"fmt"
 	"os"
 )
 
-
 /*
-** Handle all event with Gxui for gomoku
+** TYPE : Private
+** Handle all event with Gxui
 */
 
-func Event(driver gxui.Driver, window gxui.Window) {
+func handleEvent(driver gxui.Driver, window gxui.Window) {
 	window.OnKeyDown(func(ev gxui.KeyboardEvent) {
 		if ev.Key == gxui.KeyEscape || ev.Key == gxui.KeyKpEnter {
-			fmt.Println("Close")
+			fmt.Println("[LOG] Game exit, you pressed 'esc'.")
 			window.Close()
 		}
 	})
 
-	//Init List
-	list := InitMap()
-
 	window.OnClick(func(me gxui.MouseEvent) {
 		if me.Button == 0 {
 			fmt.Println(me.WindowPoint)
-
-			value := getClickPosInTab(list, me.WindowPoint)
-			if (value.PosX != -1 && value.PosY != -1){
-				DrawPawn(driver, window, gxui.White, math.Point{value.PosX,value.PosY})
-			}
 		}
 	})
 

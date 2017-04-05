@@ -26,9 +26,12 @@ func appMain(driver gxui.Driver) {
 	window.SetScale(flags.DefaultScaleFactor)
 	window.AddChild(img)
 
+	handleEvent(driver, window)
+
 	rgba := image.NewRGBA(board_img.Bounds())
 
 	draw.Draw(rgba, board_img.Bounds(), board_img, image.ZP, draw.Src)
+
 	for i, j := 6, 0; i < 1000; i, j = i + 53 + j % 2, j + 1 {
 		for k, l := 6, 0; k < 1000; k, l = k + 53 + l % 2, l + 1 {
 			drawPawns(1, i, k, wp_img, bp_img, rgba, size_board)
