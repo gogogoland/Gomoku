@@ -24,7 +24,7 @@ import (
 
 func run() int {
 	//gui.BasicDisplay(1)
-	gui.Test()
+	gui.Gui()
 	return 0
 }
 

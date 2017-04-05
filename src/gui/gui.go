@@ -1,11 +1,10 @@
 package gui
 
-import (
-	"fmt"
-	_ "image/jpeg"
-	_ "image/png"
-	"os"
+/*
+** MAIN of the package.
+*/
 
+import (
 	"image"
 	"image/draw"
 
@@ -14,45 +13,33 @@ import (
 	"github.com/google/gxui/samples/flags"
 )
 
-
-var (
-	title         string = "Gomoku"
-	width, height int    = 1024, 1024
-)
-
 func appMain(driver gxui.Driver) {
 
-	//Path to Image
-	file := "sprites/GoBoard.png"
-	f, err := os.Open(file)
-	if err != nil {
-		fmt.Printf("Failed to open image '%s': %v\n", file, err)
-		os.Exit(1)
-	}
+	board_img, wp_img, bp_img := getSprites()
 
-	source, _, err := image.Decode(f)
-	if err != nil {
-		fmt.Printf("Failed to read image '%s': %v\n", file, err)
-		os.Exit(1)
-	}
 	theme := flags.CreateTheme(driver)
 	img := theme.CreateImage()
 
-	window := theme.CreateWindow(height, width, title)
+	size_board := board_img.Bounds().Max
+	window := theme.CreateWindow(size_board.X, size_board.Y, title)
+
 	window.SetScale(flags.DefaultScaleFactor)
 	window.AddChild(img)
 
-	Event(driver, window)
+	rgba := image.NewRGBA(board_img.Bounds())
 
-	// Copy the image to a RGBA format before handing to a gxui.Texture
-	rgba := image.NewRGBA(source.Bounds())
-	draw.Draw(rgba, source.Bounds(), source, image.ZP, draw.Src)
+	draw.Draw(rgba, board_img.Bounds(), board_img, image.ZP, draw.Src)
+	for i, j := 6, 0; i < 1000; i, j = i + 53 + j % 2, j + 1 {
+		for k, l := 6, 0; k < 1000; k, l = k + 53 + l % 2, l + 1 {
+			drawPawns(1, i, k, wp_img, bp_img, rgba, size_board)
+		}
+	}
 	texture := driver.CreateTexture(rgba, 1)
 	img.SetTexture(texture)
 
 	window.OnClose(driver.Terminate)
 }
 
-func Test() {
+func Gui() {
 	gl.StartDriver(appMain)
 }

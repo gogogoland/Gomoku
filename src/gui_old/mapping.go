@@ -17,7 +17,7 @@ func InitMap() *list.List{
 
 	for y := 0; y < 19; y++ {
 		for x := 0; x < 19; x++ {
-			list.PushBack(Map{(Px * x) + 52, (Py * y) + 38, x, y})
+			list.PushBack(Map{(Px * x) + 52, (Py * y) + 45, x, y})
 		}
 	}
 	return list
