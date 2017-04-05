@@ -23,7 +23,8 @@ import (
  */
 
 func run() int {
-	gui.BasicDisplay(1)
+	//gui.BasicDisplay(1)
+	gui.Gui()
 	return 0
 }
 
