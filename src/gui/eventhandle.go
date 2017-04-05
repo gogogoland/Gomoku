@@ -8,20 +8,20 @@ import(
 
 /*
 ** TYPE : Private
-** Handle all event with Gxui
+** Handle all event with Gxui.
 */
 
 func handleEvent(driver gxui.Driver, window gxui.Window) {
 	window.OnKeyDown(func(ev gxui.KeyboardEvent) {
 		if ev.Key == gxui.KeyEscape || ev.Key == gxui.KeyKpEnter {
-			fmt.Println("[LOG] Game exit, you pressed 'esc'.")
+			fmt.Println("[LOG] Game exit, you pressed 'Esc'.")
 			window.Close()
 		}
 	})
 
 	window.OnClick(func(me gxui.MouseEvent) {
 		if me.Button == 0 {
-			fmt.Println(me.WindowPoint)
+			fmt.Println(getCursorsPosition(me.WindowPoint))
 		}
 	})
 

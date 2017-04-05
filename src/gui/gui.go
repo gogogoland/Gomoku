@@ -15,7 +15,7 @@ import (
 
 func appMain(driver gxui.Driver) {
 
-	board_img, wp_img, bp_img := getSprites()
+	board_img, _, _ := getSprites()
 
 	theme := flags.CreateTheme(driver)
 	img := theme.CreateImage()
@@ -31,12 +31,14 @@ func appMain(driver gxui.Driver) {
 	rgba := image.NewRGBA(board_img.Bounds())
 
 	draw.Draw(rgba, board_img.Bounds(), board_img, image.ZP, draw.Src)
-
+	drawPawns(1, i, k, wp_img, bp_img, rgba, size_board)
+/*
 	for i, j := 6, 0; i < 1000; i, j = i + 53 + j % 2, j + 1 {
 		for k, l := 6, 0; k < 1000; k, l = k + 53 + l % 2, l + 1 {
 			drawPawns(1, i, k, wp_img, bp_img, rgba, size_board)
 		}
 	}
+*/
 	texture := driver.CreateTexture(rgba, 1)
 	img.SetTexture(texture)
 
