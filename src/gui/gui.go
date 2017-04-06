@@ -11,6 +11,8 @@ import (
 	"github.com/google/gxui"
 	"github.com/google/gxui/drivers/gl"
 	"github.com/google/gxui/samples/flags"
+
+	"fmt"
 )
 
 func appMain(driver gxui.Driver) {
@@ -36,16 +38,19 @@ func appMain(driver gxui.Driver) {
 	window.OnClick(func(me gxui.MouseEvent) {
 		if me.Button == 0 {
 			pos := getCursorsPosition(me.WindowPoint)
-			if (play(pos.X, pos.Y) == 0) {
-				draw.Draw(rgba, board_img.Bounds(), board_img, image.ZP, draw.Src)
-				board := GData.GetBoard()
-		  		for i := 0; i < 19; i += 1 {
-			    	for j:=0; j < 19; j += 1{
-							if (board[i][j] > 0){
-			      		drawPawns(board[i][j], j, i, wp_img, bp_img, rgba, size_board)
-								texture := driver.CreateTexture(rgba, 1)
-								img.SetTexture(texture)
-	}}}}}})
+			if (GData.Gain() != 0){
+				fmt.Println("[DEBUG] YOU WIN or LOSE.")
+			} else {
+				if (play(pos.X, pos.Y) == 0) {
+					draw.Draw(rgba, board_img.Bounds(), board_img, image.ZP, draw.Src)
+					board := GData.GetBoard()
+		  			for i := 0; i < 19; i += 1 {
+			    		for j:=0; j < 19; j += 1{
+								if (board[i][j] > 0){
+			      			drawPawns(board[i][j], j, i, wp_img, bp_img, rgba, size_board)
+									texture := driver.CreateTexture(rgba, 1)
+									img.SetTexture(texture)
+	}}}}}}})
 
 	texture := driver.CreateTexture(rgba, 1)
 	img.SetTexture(texture)
