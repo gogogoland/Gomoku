@@ -24,7 +24,7 @@ import (
  * Function of pathfinding
  *
  * TODO:
- * 		Stop the A* when best move detect
+ * 		Stop the A* when best move detect (die hard at 5 deepness)
  * 		Seek Goroutine
  *		Check USE OF IA to defend and attack
  * 		NOTHING

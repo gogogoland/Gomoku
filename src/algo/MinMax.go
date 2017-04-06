@@ -16,7 +16,6 @@ package algo
  * Adding pawn layer and get probabilty of win
  *
  * TODO:
- * 		Test free three for particular ate
  * 		Check victory probability for better IA
  *
  * 		NOTHING
@@ -57,7 +56,7 @@ func (child *GameData) CheckAlignement(pawn Pawns) {
 				winAlign = 0
 			}
 
-			if limAlign >= 3 && dispo == 5 {
+			if limAlign == 3 && dispo == 5 {
 				child.GetPlayer(child.turn).threef.Add(AlignPInit(x-(limAlign+1)*(s/2+BoolToInt(s == 0)), y-(limAlign+1)*(s%2-BoolToInt(s == 0)), s))
 			}
 			if winAlign == 5 {
@@ -77,7 +76,9 @@ func (child *GameData) CheckAlignement(pawn Pawns) {
 func (child *GameData) CheckEatPawn(pawn Pawns) {
 	var x, y, px, py int
 	var otherPlayer int
+	var toCheck bool
 
+	toCheck = false
 	otherPlayer = child.GetOtherTurn()
 	for x = -3; x <= 3; x += 3 {
 		for y = -3; y <= 3; y += 3 {
@@ -93,14 +94,17 @@ func (child *GameData) CheckEatPawn(pawn Pawns) {
 				if x != 0 && y != 0 {
 					child.DiagonalEatRemovePawn(pawn, px, py)
 				}
+				toCheck = true
 			}
 		}
 	}
 
-	if child.turn != child.facundo.whoiam {
-		child.facundo.CheckAlignPawnPlayer(child.board)
-	} else if child.turn != child.human.whoiam {
-		child.human.CheckAlignPawnPlayer(child.board)
+	if toCheck == true {
+		if child.turn != child.facundo.whoiam {
+			child.facundo.CheckAlignPawnPlayer(child.board)
+		} else if child.turn != child.human.whoiam {
+			child.human.CheckAlignPawnPlayer(child.board)
+		}
 	}
 }
 
@@ -148,12 +152,12 @@ func (child *GameData) RemoveUnavailableMove(px, py int) {
 **/
 func (player *Player) CheckAlignPawnPlayer(Board [][]int) {
 	var lenSliceAP, i int
-	var dispo int
+	var check int
 
 	lenSliceAP = len(player.threef)
 	for i = 0; i < lenSliceAP; i++ {
-		dispo, _ = CheckAlignPawnLocal(Board, player.threef[i], player.whoiam)
-		if dispo < 5 {
+		check, _ = CheckAlignPawnLocal(Board, player.threef[i], player.whoiam)
+		if check < 5 {
 			player.threef[i] = player.threef[len(player.threef)-1]
 			player.threef = player.threef[:len(player.threef)-1]
 			lenSliceAP--
@@ -162,8 +166,8 @@ func (player *Player) CheckAlignPawnPlayer(Board [][]int) {
 
 	lenSliceAP = len(player.five_w)
 	for i = 0; i < lenSliceAP; i++ {
-		dispo, _ = CheckAlignPawnLocal(Board, player.five_w[i], player.whoiam)
-		if dispo < 5 {
+		_, check = CheckAlignPawnLocal(Board, player.five_w[i], player.whoiam)
+		if check < 5 {
 			player.five_w[i] = player.five_w[len(player.five_w)-1]
 			player.five_w = player.five_w[:len(player.five_w)-1]
 			lenSliceAP--
