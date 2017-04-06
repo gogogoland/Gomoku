@@ -15,7 +15,7 @@ import (
 
 func appMain(driver gxui.Driver) {
 
-	board_img, _, _ := getSprites()
+	board_img, wp_img, bp_img := getSprites()
 
 	theme := flags.CreateTheme(driver)
 	img := theme.CreateImage()
@@ -26,19 +26,27 @@ func appMain(driver gxui.Driver) {
 	window.SetScale(flags.DefaultScaleFactor)
 	window.AddChild(img)
 
-	handleEvent(driver, window)
 
 	rgba := image.NewRGBA(board_img.Bounds())
-
 	draw.Draw(rgba, board_img.Bounds(), board_img, image.ZP, draw.Src)
-	drawPawns(1, i, k, wp_img, bp_img, rgba, size_board)
-/*
-	for i, j := 6, 0; i < 1000; i, j = i + 53 + j % 2, j + 1 {
-		for k, l := 6, 0; k < 1000; k, l = k + 53 + l % 2, l + 1 {
-			drawPawns(1, i, k, wp_img, bp_img, rgba, size_board)
-		}
-	}
-*/
+
+	handleEvent(driver, window)
+
+	//Get position of the click and check if the move is ok.
+	window.OnClick(func(me gxui.MouseEvent) {
+		if me.Button == 0 {
+			pos := getCursorsPosition(me.WindowPoint)
+			if (play(pos.X, pos.Y) == 0) {
+				draw.Draw(rgba, board_img.Bounds(), board_img, image.ZP, draw.Src)
+				board := GData.GetBoard()
+		  		for i := 0; i < 19; i += 1 {
+			    	for j:=0; j < 19; j += 1{
+							if (board[i][j] > 0){
+			      		drawPawns(board[i][j], j, i, wp_img, bp_img, rgba, size_board)
+								texture := driver.CreateTexture(rgba, 1)
+								img.SetTexture(texture)
+	}}}}}})
+
 	texture := driver.CreateTexture(rgba, 1)
 	img.SetTexture(texture)
 

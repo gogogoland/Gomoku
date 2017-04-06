@@ -19,12 +19,6 @@ func handleEvent(driver gxui.Driver, window gxui.Window) {
 		}
 	})
 
-	window.OnClick(func(me gxui.MouseEvent) {
-		if me.Button == 0 {
-			fmt.Println(getCursorsPosition(me.WindowPoint))
-		}
-	})
-
 	window.OnResize(func(){
 		fmt.Println("[ERROR] : someone try to resize the window.")
 		os.Exit(1)
