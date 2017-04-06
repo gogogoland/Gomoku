@@ -61,6 +61,7 @@ func (child *GameData) CheckAlignement(pawn Pawns) {
 			}
 			if winAlign == 5 {
 				child.GetPlayer(child.turn).five_w.Add(AlignPInit(x-(winAlign-1)*(s/2+BoolToInt(s == 0)), y-(winAlign-1)*(s%2-BoolToInt(s == 0)), s))
+				child.GetPlayer(child.turn).threef.Del(AlignPInit(x-(winAlign-1)*(s/2+BoolToInt(s == 0)), y-(winAlign-1)*(s%2-BoolToInt(s == 0)), s))
 			}
 		}
 	}
@@ -76,9 +77,7 @@ func (child *GameData) CheckAlignement(pawn Pawns) {
 func (child *GameData) CheckEatPawn(pawn Pawns) {
 	var x, y, px, py int
 	var otherPlayer int
-	var toCheck bool
 
-	toCheck = false
 	otherPlayer = child.GetOtherTurn()
 	for x = -3; x <= 3; x += 3 {
 		for y = -3; y <= 3; y += 3 {
@@ -94,16 +93,7 @@ func (child *GameData) CheckEatPawn(pawn Pawns) {
 				if x != 0 && y != 0 {
 					child.DiagonalEatRemovePawn(pawn, px, py)
 				}
-				toCheck = true
 			}
-		}
-	}
-
-	if toCheck == true {
-		if child.turn != child.facundo.whoiam {
-			child.facundo.CheckAlignPawnPlayer(child.board)
-		} else if child.turn != child.human.whoiam {
-			child.human.CheckAlignPawnPlayer(child.board)
 		}
 	}
 }
@@ -265,8 +255,8 @@ func (player *Player) CheckWinLose(turn int) {
 	} else {
 		player.winpot = (float32)(player.atenum) / 5.0
 	}
-	player.winpot += (1.0 - player.winpot) * (1.0 - (1.0 / (float32)(len(player.threef)+1)))
 	player.winpot += (1.0 - player.winpot) * (0.8 * BoolToFloat32(len(player.five_w) > 0))
+	player.winpot += (1.0 - player.winpot) * (1.0 - (1.0 / (float32)(len(player.threef)+1)))
 }
 
 /**
@@ -324,6 +314,7 @@ func (child *GameData) TurnProcess(pawn Pawns) int {
 
 	FreeThree = len(child.GetPlayer(child.turn).threef)
 	child.CheckEatPawn(pawn)
+	child.GetPlayer(child.GetOtherTurn()).CheckAlignPawnPlayer(child.board)
 	child.CheckAlignement(pawn)
 	if len(child.GetPlayer(child.turn).threef) > FreeThree && FreeThree > 0 {
 		return 1

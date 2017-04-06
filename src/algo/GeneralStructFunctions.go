@@ -69,6 +69,19 @@ func (data *SliceAP) Add(new AlignP) {
 	*data = append(*data, new)
 }
 
+func (data *SliceAP) Del(del AlignP) {
+	var cur, lenSlice int
+
+	lenSlice = len(*data)
+	for cur = 0; cur < lenSlice; cur++ {
+		if (*data)[cur].Compare(del) {
+			(*data)[cur] = (*data)[lenSlice-1]
+			*data = (*data)[:lenSlice-1]
+			return
+		}
+	}
+}
+
 func (data SliceAP) Copy() SliceAP {
 	var theone SliceAP
 	var lenAlP, curAlP int
@@ -123,11 +136,12 @@ func (get *Pawns) GetY() int {
  * 	Functions for NextPawns structures
 **/
 
-func NextPawnsInit(x, y, test_n int, winpot float32) NextPawns {
+func NextPawnsInit(x, y, test_n int, winpot float32, tested bool) NextPawns {
 	return NextPawns{
 		pawn_p: PawnsInit(x, y),
 		winpot: winpot,
 		test_n: test_n,
+		tested: tested,
 	}
 }
 
@@ -136,6 +150,7 @@ func (data NextPawns) Copy() NextPawns {
 		pawn_p: data.pawn_p.Copy(),
 		winpot: data.winpot,
 		test_n: data.test_n,
+		tested: data.tested,
 	}
 }
 

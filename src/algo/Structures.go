@@ -72,6 +72,7 @@ type NextPawns struct {
 	pawn_p Pawns
 	winpot float32
 	test_n int
+	tested bool
 }
 
 //	*	Slice of MinMax data

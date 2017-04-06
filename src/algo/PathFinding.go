@@ -71,11 +71,14 @@ func (Mom *GameData) Pathfinding(deepness, IA int) {
 		for i := 0; i < childNum; {
 			//childo, lessMove := <-link//link
 			childo, lessMove := MinMax(childs, childPawn[i])
-			i++
 			if lessMove > 0 {
+				childNum -= lessMove
 				maxMove -= lessMove
+				childPawn[i] = childPawn[childNum]
+				childPawn = childPawn[:childNum]
 				continue
 			}
+			i++
 			childo.prob = GetProbabilityByDeepness(childo.deep, childNum, 1)
 			//if childs.human.winpot >= 1.0 || childo.facundo.winpot >= 1.0 {//direct
 			//	childo.AddGameDataToHeapList(clos)//direct
@@ -120,7 +123,7 @@ func (Mom *GameData) GetOptimalPath(queu *PrioQueue, IA int, timeStart time.Time
 	var i, randval int
 
 	childPawn = Mom.GetPossiblePlace()
-	FacundoMove = NextPawnsInit(-1, -1, 0, -1.0)
+	FacundoMove = NextPawnsInit(-1, -1, 0, -1.0, false)
 	childPawnLen = len(childPawn)
 	for len(*queu) > 0 {
 		childs = heap.Pop(queu).(GameData)
@@ -133,11 +136,15 @@ func (Mom *GameData) GetOptimalPath(queu *PrioQueue, IA int, timeStart time.Time
 			childPawn[i].test_n += childs.prob
 			childPawn[i].winpot += (float32)(childs.UseOfIA(IA))
 			childPawn[i].winpot = childPawn[i].winpot / (float32)(childPawn[i].test_n)
+			childPawn[i].tested = true
 		}
 	}
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano()))
 	for i = 0; i < childPawnLen; i++ {
+		if childPawn[i].tested == false {
+			continue
+		}
 		//fmt.Println("FacundoMove :", FacundoMove, "ChildPawn :", childPawn[i])
 		if FacundoMove.winpot < childPawn[i].winpot {
 			FacundoMove = childPawn[i].Copy()
@@ -207,7 +214,7 @@ func (gd *GameData) GetPossiblePlace() []NextPawns {
 	for curx = 0; curx < gd.maxx; curx++ {
 		for cury = 0; cury < gd.maxy; cury++ {
 			if gd.board[curx][cury] == 0 || gd.board[curx][cury] == -1*gd.turn {
-				np[i] = NextPawnsInit(curx, cury, np_size, 0.0)
+				np[i] = NextPawnsInit(curx, cury, np_size, 0.0, false)
 				i++
 			}
 		}
