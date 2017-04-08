@@ -142,12 +142,12 @@ func (child *GameData) RemoveUnavailableMove(px, py int) {
 **/
 func (player *Player) CheckAlignPawnPlayer(Board [][]int) {
 	var lenSliceAP, i int
-	var check int
+	var dispo, align int
 
 	lenSliceAP = len(player.threef)
 	for i = 0; i < lenSliceAP; i++ {
-		check, _ = CheckAlignPawnLocal(Board, player.threef[i], player.whoiam)
-		if check < 5 {
+		dispo, align = CheckAlignPawnLocal(Board, player.threef[i], player.whoami)
+		if dispo < 5 && align < 3 {
 			player.threef[i] = player.threef[len(player.threef)-1]
 			player.threef = player.threef[:len(player.threef)-1]
 			lenSliceAP--
@@ -156,8 +156,8 @@ func (player *Player) CheckAlignPawnPlayer(Board [][]int) {
 
 	lenSliceAP = len(player.five_w)
 	for i = 0; i < lenSliceAP; i++ {
-		_, check = CheckAlignPawnLocal(Board, player.five_w[i], player.whoiam)
-		if check < 5 {
+		dispo, align = CheckAlignPawnLocal(Board, player.five_w[i], player.whoami)
+		if align < 5 {
 			player.five_w[i] = player.five_w[len(player.five_w)-1]
 			player.five_w = player.five_w[:len(player.five_w)-1]
 			lenSliceAP--
@@ -171,16 +171,16 @@ func (player *Player) CheckAlignPawnPlayer(Board [][]int) {
  * 	Check avaible and occuped box for specific alignement
  * 	Return avaible box and concret alignement
 **/
-func CheckAlignPawnLocal(Board [][]int, threef AlignP, whoiam int) (int, int) {
+func CheckAlignPawnLocal(Board [][]int, threef AlignP, whoami int) (int, int) {
 	var x, y, n int
 	var dispo, align int
 
 	for dispo, align, n = 0, 0, 0; n < 5; n++ {
 		x = threef.pos.x + n*(threef.dir/2+BoolToInt(threef.dir == 0))
 		y = threef.pos.y + n*(threef.dir%2-BoolToInt(threef.dir == 0))
-		if x < 0 || y < 0 || x >= len(Board) || y >= len(Board[0]) || (Board[x][y] != whoiam && Board[x][y] > 0) {
+		if x < 0 || y < 0 || x >= len(Board) || y >= len(Board[0]) || (Board[x][y] != whoami && Board[x][y] > 0) {
 			return 0, 0
-		} else if Board[x][y] == whoiam {
+		} else if Board[x][y] == whoami {
 			dispo++
 			align++
 		} else {
@@ -203,9 +203,9 @@ func CheckAlignPawnLocal(Board [][]int, threef AlignP, whoiam int) (int, int) {
 func (child *GameData) AddAteNumPlayer(x1, y1, x2, y2 int) {
 	child.board[x1][y1] = 0
 	child.board[x2][y2] = 0
-	if child.turn == child.facundo.whoiam {
+	if child.turn == child.facundo.whoami {
 		child.facundo.atenum++
-	} else if child.turn == child.human.whoiam {
+	} else if child.turn == child.human.whoami {
 		child.human.atenum++
 	}
 }
@@ -241,7 +241,22 @@ func (child *GameData) AddPawnOnBoard(pawn Pawns) bool {
 }
 
 /**
- * 	"Check Win/Lose Probability"
+ * "Check Win/Lose Probability"
+ *
+ * 	With "Check Player Win/Lose Probability" function (see below),
+ * 	Check each player victory, if so, put other player at minus
+**/
+func (child *GameData) CheckWinLose() {
+	var humanWin, facundoWin float32
+
+	humanWin = child.human.CheckPlayerWinLose(child.turn)
+	facundoWin = child.facundo.CheckPlayerWinLose(child.turn)
+	child.human.winpot -= facundoWin
+	child.facundo.winpot -= humanWin
+}
+
+/**
+ * 	"Check Player Win/Lose Probability"
  *
  * 	Calcul win/lose probability for each player given the below requirement:
  * 	Five pawns aligned from other player (Win for other player)
@@ -249,14 +264,15 @@ func (child *GameData) AddPawnOnBoard(pawn Pawns) bool {
  *
  * 	Check also other data (number of threef (three free),peer of pawns eaten)
 **/
-func (player *Player) CheckWinLose(turn int) {
-	if turn != player.whoiam && len(player.five_w) > 0 {
+func (player *Player) CheckPlayerWinLose(turn int) float32 {
+	if turn != player.whoami && len(player.five_w) > 0 {
 		player.winpot = 1.0
 	} else {
 		player.winpot = (float32)(player.atenum) / 5.0
 	}
 	player.winpot += (1.0 - player.winpot) * (0.8 * BoolToFloat32(len(player.five_w) > 0))
 	player.winpot += (1.0 - player.winpot) * (1.0 - (1.0 / (float32)(len(player.threef)+1)))
+	return 2 * BoolToFloat32(player.winpot >= 1.0)
 }
 
 /**
@@ -274,7 +290,7 @@ func MinMax(childs GameData, pawn NextPawns /*, link chan GameData*/) (GameData,
 	child = childs.Copy()
 	denied = (&child).TurnProcess(pawn.pawn_p)
 	child.deep--
-	//link <- child, denied//link
+	//link//link <- child, denied
 	return child, denied
 }
 
@@ -313,16 +329,15 @@ func (child *GameData) TurnProcess(pawn Pawns) int {
 	}
 
 	FreeThree = len(child.GetPlayer(child.turn).threef)
-	child.CheckEatPawn(pawn)
-	child.GetPlayer(child.GetOtherTurn()).CheckAlignPawnPlayer(child.board)
+	if FreeThree <= 0 {
+		FreeThree = 1
+	}
 	child.CheckAlignement(pawn)
 	if len(child.GetPlayer(child.turn).threef) > FreeThree && FreeThree > 0 {
 		return 1
 	}
-
-	child.human.pawn_p, child.facundo.pawn_p = child.move.Copy(), child.move.Copy()
-	child.human.CheckWinLose(child.turn)
-	child.facundo.CheckWinLose(child.turn)
-
+	child.CheckEatPawn(pawn)
+	child.GetPlayer(child.GetOtherTurn()).CheckAlignPawnPlayer(child.board)
+	child.CheckWinLose()
 	return 0
 }

@@ -37,7 +37,7 @@ type SliceAP []AlignP
 //	*	Player data
 type Player struct {
 	atenum int
-	whoiam int
+	whoami int
 	pawn_p Pawns
 	five_w SliceAP
 	//four_w SliceAP
@@ -63,6 +63,8 @@ type GameData struct {
 	prob   int
 	turn   int
 	whowin int
+	round  int
+	ai     int
 	//Add probabilty ?
 	//wilo	float32
 }

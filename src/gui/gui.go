@@ -42,7 +42,7 @@ func appMain(driver gxui.Driver) {
 			} else if GData.Gain() == 2 {
 				fmt.Println("YOU LOSE.")
 			} else {
-				if play(pos.X, pos.Y) == 0 {
+				if play(pos.X, pos.Y, false) == 0 {
 					draw.Draw(rgba, board_img.Bounds(), board_img, image.ZP, draw.Src)
 					board := GData.GetBoard()
 					if GData.Gain() == 1 {

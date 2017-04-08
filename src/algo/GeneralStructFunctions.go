@@ -222,7 +222,7 @@ func (data Board) Copy() Board {
 func PlayerInit(whoareyou int) Player {
 	return Player{
 		atenum: 0,
-		whoiam: whoareyou,
+		whoami: whoareyou,
 		pawn_p: PawnsInit(-1, -1),
 		five_w: nil,
 		threef: nil,
@@ -233,7 +233,7 @@ func PlayerInit(whoareyou int) Player {
 func (data *Player) Copy() Player {
 	return Player{
 		atenum: data.atenum,
-		whoiam: data.whoiam,
+		whoami: data.whoami,
 		pawn_p: data.pawn_p.Copy(),
 		five_w: data.five_w.Copy(),
 		threef: data.threef.Copy(),
@@ -249,8 +249,8 @@ func (get *Player) GetAteNum() int {
 	return get.atenum
 }
 
-func (get *Player) GetWhoIAm() int {
-	return get.whoiam
+func (get *Player) GetWhoAmI() int {
+	return get.whoami
 }
 
 func (get *Player) GetPawn_P() Pawns {
@@ -305,6 +305,8 @@ func GameDataInit(whobegin int) GameData {
 		prob:    0,
 		turn:    whobegin,
 		whowin:  0,
+		round:   0,
+		ai:      1,
 	}
 }
 
@@ -320,6 +322,8 @@ func (data *GameData) Copy() GameData {
 		prob:    data.prob,
 		turn:    data.turn,
 		whowin:  data.whowin,
+		round:   data.round,
+		ai:      data.ai,
 	}
 }
 
@@ -332,9 +336,13 @@ func (data *GameData) Deep(deepness int) GameData {
 }
 
 func (data *GameData) Gain() int {
-	data.whowin = data.facundo.whoiam * BoolToInt(data.facundo.winpot >= 1.0)
-	data.whowin += data.human.whoiam * BoolToInt(data.human.winpot >= 1.0)
+	data.whowin = data.facundo.whoami * BoolToInt(data.facundo.winpot >= 1.0)
+	data.whowin += data.human.whoami * BoolToInt(data.human.winpot >= 1.0)
 	return data.whowin
+}
+
+func (data *GameData) SetIA(ai int) {
+	data.ai = ai
 }
 
 /**
@@ -349,11 +357,20 @@ func (get *GameData) GetFacundo() *Player {
 	return &get.facundo
 }
 
-func (get *GameData) GetPlayer(whoiam int) *Player {
-	if get.human.whoiam == whoiam {
+func (get *GameData) GetPlayer(whoami int) *Player {
+	if get.human.whoami == whoami {
 		return get.GetHuman()
-	} else if get.facundo.whoiam == whoiam {
+	} else if get.facundo.whoami == whoami {
 		return get.GetFacundo()
+	}
+	return nil
+}
+
+func (get *GameData) GetOtherPlayer(whoami int) *Player {
+	if get.human.whoami == whoami {
+		return get.GetFacundo()
+	} else if get.facundo.whoami == whoami {
+		return get.GetHuman()
 	}
 	return nil
 }
@@ -383,10 +400,10 @@ func (get *GameData) GetTurn() int {
 }
 
 func (get *GameData) GetOtherTurn() int {
-	if get.turn == get.human.whoiam {
-		return get.facundo.whoiam
-	} else if get.turn == get.facundo.whoiam {
-		return get.human.whoiam
+	if get.turn == get.human.whoami {
+		return get.facundo.whoami
+	} else if get.turn == get.facundo.whoami {
+		return get.human.whoami
 	}
 	return 0
 }
@@ -410,6 +427,10 @@ func (get *GameData) PrintBoard() {
 		}
 		print("\n")
 	}
+}
+
+func (get *GameData) GetRound() int {
+	return get.round
 }
 
 /**

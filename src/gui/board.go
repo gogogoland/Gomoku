@@ -6,7 +6,7 @@ import (
 )
 
 //Play until GameDataGain != 0
-func play(posY, posX int) int {
+func play(posY, posX int, vs bool) int {
 
 	if GData.PlayerTurn(algo.PawnsInit(posX, posY)) == 1 {
 		GData.PrintBoard()
@@ -22,7 +22,7 @@ func play(posY, posX int) int {
 	if GData.Gain() != 0 {
 		return 0
 	}
-	GData.Pathfinding(3, 1)
+	GData.Pathfinding(3, 1, vs)
 	GData.PrintBoard()
 	fmt.Println("HUMAN RESULT:", *(GData.GetHuman()))
 	fmt.Println("FACUNDO RESULT:", *(GData.GetFacundo()))
