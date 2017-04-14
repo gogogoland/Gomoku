@@ -55,14 +55,14 @@ func (heapList PrioQueue) Swap(i, j int) {
 
 //	*	Check order by deepness and scoring value
 func (heapList PrioQueue) Less(i, j int) bool {
-	//return heapList[i].deep > heapList[j].deep
-	//if heapList[i].prob == heapList[j].prob {
+	/*if heapList[i].deep == heapList[j].deep {
+		return heapList[i].UseOfIA(heapList[i].turn) > heapList[j].UseOfIA(heapList[j].turn)
+	}
+	return heapList[i].deep > heapList[j].deep*/
 	if heapList[i].UseOfIA(heapList[i].turn) == heapList[j].UseOfIA(heapList[j].turn) {
 		return heapList[i].deep > heapList[j].deep
 	}
 	return heapList[i].UseOfIA(heapList[i].turn) > heapList[j].UseOfIA(heapList[j].turn)
-	//return heapList[i].prob > heapList[j].prob
-	//return heapList[i].prob*heapList[i].deep > heapList[j].prob*heapList[j].deep
 }
 
 //	*	Get len

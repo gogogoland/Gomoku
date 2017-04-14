@@ -25,13 +25,16 @@ package algo
  * 	"Check Alignement"
  *
  * 	Check if new pawn made an alignement with other pawns (in 8 direction)
+ * 	(limAlign is for aligned pawn with isolate space between them)
+ * 	(dispo is for available space)
+ * 	(winAlign is for uninterruptable alignement)
  * 	If so save it for:
  * 		threef (2-3 aligned and 5 available) SliceAP
  * 		five_w (5 aligned) SliceAP
 **/
 func (child *GameData) CheckAlignement(pawn Pawns) {
 	var x, y, s int
-	var check, winAlign, limAlign, dispo int
+	var check, winAlign, limAlign, dispo, eat int
 
 	winAlign, limAlign = 0, 0
 	for s = 0; s < 4 && winAlign < 5; s++ {
@@ -51,13 +54,20 @@ func (child *GameData) CheckAlignement(pawn Pawns) {
 					dispo++
 				} else {
 					dispo = BoolToInt(child.board[x][y] <= 0)
+					eat = BoolToInt(child.board[x][y] > 0)
 					limAlign = 0
 				}
 				winAlign = 0
 			}
 
+			if eat == 1 && winAlign == 2 && (check == 0 || check == 1) {
+				child.GetOtherPlayer(child.turn).eating.Add(PawnsInit(x-(limAlign+1)*(s/2+BoolToInt(s == 0)), y-(limAlign+1)*(s%2-BoolToInt(s == 0))))
+			}
 			if limAlign == 3 && dispo == 5 {
 				child.GetPlayer(child.turn).threef.Add(AlignPInit(x-(limAlign+1)*(s/2+BoolToInt(s == 0)), y-(limAlign+1)*(s%2-BoolToInt(s == 0)), s))
+			}
+			if limAlign == 4 && dispo == 5 {
+				child.GetPlayer(child.turn).four_w.Add(AlignPInit(x-(limAlign)*(s/2+BoolToInt(s == 0)), y-(limAlign)*(s%2-BoolToInt(s == 0)), s))
 			}
 			if winAlign == 5 {
 				child.GetPlayer(child.turn).five_w.Add(AlignPInit(x-(winAlign-1)*(s/2+BoolToInt(s == 0)), y-(winAlign-1)*(s%2-BoolToInt(s == 0)), s))
@@ -82,16 +92,20 @@ func (child *GameData) CheckEatPawn(pawn Pawns) {
 	for x = -3; x <= 3; x += 3 {
 		for y = -3; y <= 3; y += 3 {
 			px, py = pawn.x+x, pawn.y+y
-			if px >= 0 && py >= 0 && px < child.maxx && py < child.maxy && child.board[px][py] == child.turn && child.board[px-(x/3)][py-(y/3)] == otherPlayer && child.board[px-(2*x/3)][py-(2*y/3)] == otherPlayer {
-				child.AddAteNumPlayer(px-(x/3), py-(y/3), px-(2*x/3), py-(2*y/3))
-				child.CheckAlignement(Pawns{
-					x: px - (x / 3),
-					y: py - (y / 3)})
-				child.CheckAlignement(Pawns{
-					x: px - (2 * x / 3),
-					y: py - (2 * y / 3)})
-				if x != 0 && y != 0 {
-					child.DiagonalEatRemovePawn(pawn, px, py)
+			if px >= 0 && py >= 0 && px < child.maxx && py < child.maxy && child.board[px-(x/3)][py-(y/3)] == otherPlayer && child.board[px-(2*x/3)][py-(2*y/3)] == otherPlayer {
+				if child.board[px][py] == child.turn {
+					child.AddAteNumPlayer(px-(x/3), py-(y/3), px-(2*x/3), py-(2*y/3))
+					child.CheckAlignement(Pawns{
+						x: px - (x / 3),
+						y: py - (y / 3)})
+					child.CheckAlignement(Pawns{
+						x: px - (2 * x / 3),
+						y: py - (2 * y / 3)})
+					if x != 0 && y != 0 {
+						child.DiagonalEatRemovePawn(pawn, px, py)
+					}
+				} else if child.board[px][py] <= 0 {
+					child.GetPlayer(child.turn).eating.Add(PawnsInit(px, py))
 				}
 			}
 		}
@@ -139,28 +153,48 @@ func (child *GameData) RemoveUnavailableMove(px, py int) {
  *
  * 	Verify saved alignement with "Check Current Alignement" (see below)
  * 	If avaible box is under five, delete it
+ * 	If eating pawn is unavailable, delete it
 **/
 func (player *Player) CheckAlignPawnPlayer(Board [][]int) {
-	var lenSliceAP, i int
+	var lenSlice, i int
 	var dispo, align int
 
-	lenSliceAP = len(player.threef)
-	for i = 0; i < lenSliceAP; i++ {
+	lenSlice = len(player.threef)
+	for i = 0; i < lenSlice; i++ {
 		dispo, align = CheckAlignPawnLocal(Board, player.threef[i], player.whoami)
 		if dispo < 5 && align < 3 {
 			player.threef[i] = player.threef[len(player.threef)-1]
 			player.threef = player.threef[:len(player.threef)-1]
-			lenSliceAP--
+			lenSlice--
 		}
 	}
 
-	lenSliceAP = len(player.five_w)
-	for i = 0; i < lenSliceAP; i++ {
+	lenSlice = len(player.four_w)
+	for i = 0; i < lenSlice; i++ {
+		dispo, align = CheckAlignPawnLocal(Board, player.four_w[i], player.whoami)
+		if dispo < 5 {
+			player.four_w[i] = player.four_w[len(player.four_w)-1]
+			player.four_w = player.four_w[:len(player.four_w)-1]
+			lenSlice--
+		}
+	}
+
+	lenSlice = len(player.five_w)
+	for i = 0; i < lenSlice; i++ {
 		dispo, align = CheckAlignPawnLocal(Board, player.five_w[i], player.whoami)
 		if align < 5 {
 			player.five_w[i] = player.five_w[len(player.five_w)-1]
 			player.five_w = player.five_w[:len(player.five_w)-1]
-			lenSliceAP--
+			lenSlice--
+		}
+	}
+
+	lenSlice = len(player.eating)
+	for i = 0; i < lenSlice; i++ {
+		if player.eating[i].x > 19 || player.eating[i].x < 0 || player.eating[i].y > 19 || player.eating[i].y < 0 || Board[player.eating[i].x][player.eating[i].y] > 0 {
+			player.eating[i] = player.eating[len(player.eating)-1]
+			player.eating = player.eating[:len(player.eating)-1]
+			lenSlice--
 		}
 	}
 }
@@ -262,7 +296,8 @@ func (child *GameData) CheckWinLose() {
  * 	Five pawns aligned from other player (Win for other player)
  * 	Five peer of pawns ate (Win for current player)
  *
- * 	Check also other data (number of threef (three free),peer of pawns eaten)
+ * 	Check also other data :
+ * 	(number of threef (three free),peer of pawns eaten, eatable pawns, four pawns)
 **/
 func (player *Player) CheckPlayerWinLose(turn int) float32 {
 	if turn != player.whoami && len(player.five_w) > 0 {
@@ -270,8 +305,10 @@ func (player *Player) CheckPlayerWinLose(turn int) float32 {
 	} else {
 		player.winpot = (float32)(player.atenum) / 5.0
 	}
-	player.winpot += (1.0 - player.winpot) * (0.8 * BoolToFloat32(len(player.five_w) > 0))
-	player.winpot += (1.0 - player.winpot) * (1.0 - (1.0 / (float32)(len(player.threef)+1)))
+	player.winpot += (1.0 - player.winpot) * (0.6 * BoolToFloat32(len(player.five_w) > 0))
+	player.winpot += (1.0 - player.winpot) * (0.45 - (0.45 / (float32)(len(player.threef)+1)))
+	player.winpot += (1.0 - player.winpot) * (0.3 - (0.3 / (float32)(len(player.threef)+1)))
+	player.winpot += (1.0 - player.winpot) * (0.15 - (0.15 / (float32)(len(player.eating)+1)))
 	return 2 * BoolToFloat32(player.winpot >= 1.0)
 }
 

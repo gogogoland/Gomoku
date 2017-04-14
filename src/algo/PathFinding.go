@@ -24,8 +24,12 @@ import (
  * Function of pathfinding
  *
  * TODO:
+ * 		Add direct win detect (use only the winning move by this path)
+ *
  * 		Stop the A* when best move detect (die hard at 5 deepness)
+ * 		Take the first best move from open list
  * 		Seek Goroutine
+ *
  *		Check USE OF IA to defend and attack
  * 		NOTHING
 **/
@@ -124,10 +128,10 @@ func (Mom *GameData) Pathfinding(deepness, IA int, vs bool) {
 	//link////Make link between goroutine and original tree
 	//link//link = make(chan GameData)
 
-	open = Mom.InitHeapList(10)
+	open = Mom.InitHeapList(2 * 10)
 	heap.Init(open)
-	clos = Mom.InitHeapList(-1)
-	heap.Init(clos)
+	clos = nil
+	hope = nil
 
 	for len(*open) > 0 && time.Since(timeStart).Nanoseconds()/1000000 < 500 {
 		childs = heap.Pop(open).(GameData)
@@ -154,27 +158,32 @@ func (Mom *GameData) Pathfinding(deepness, IA int, vs bool) {
 			}
 			// <- HERE THE BEGINNING OF THE LINK (new function)
 			if childo.deep != 0 && childo.facundo.winpot < 1.0 && childo.human.winpot < 1.0 {
-				hope = childo.InitHeapList(-1)
-				heap.Init(hope)
 				childo.turn = childo.GetOtherTurn()
 				childoPawn = childs.GetPossiblePlace()
 				childoNum = len(childoPawn)
 				for j := 0; j < childoNum; {
 					childt, less = MinMax(childo, childoPawn[j])
-					/*if childoPawn.RemoveInvalidMove(less, i) {
-					childoNum -= less
-					continue*/
 					if less == 1 {
 						childoPawn[j] = childoPawn[childoNum-1]
 						childoPawn = childoPawn[:childoNum-1]
 						childoNum -= 1
 						continue
-					} else if len(childt.GetHuman().GetFive_W()) > 0 { //.GetWhoAmI() == childt.Gain() {
+						//} else if len(childt.GetHuman().GetFive_W()) > 0 { //.GetWhoAmI() == childt.Gain() {
+						//} else if childt.GetHuman().GetWhoAmI() == childt.Gain() {
+					} else if childt.GetHuman().GetWhoAmI() == childt.Gain() || len(childt.GetHuman().GetFive_W()) > 0 {
+						if clos == nil {
+							clos = childt.InitHeapList(childt.deep)
+							heap.Init(clos)
+						} else {
+							childt.AddGameDataToHeapList(clos)
+						}
 						childoNum = 0
-						//THIS PATH IS NOT GOOD
 						break
+					} else if hope == nil {
+						hope = childt.InitHeapList(childt.deep)
+						heap.Init(hope)
 					} else {
-						childo.AddGameDataToHeapList(hope)
+						childt.AddGameDataToHeapList(hope)
 					}
 					j++
 				}
@@ -182,11 +191,17 @@ func (Mom *GameData) Pathfinding(deepness, IA int, vs bool) {
 					childt = heap.Pop(hope).(GameData)
 					if childo.deep != 0 && childo.facundo.winpot < 1.0 {
 						childt.AddGameDataToHeapList(open)
+					} else if clos == nil {
+						clos = childt.InitHeapList(childt.deep)
+						heap.Init(clos)
 					} else {
 						childt.AddGameDataToHeapList(clos)
 					}
 				}
 				hope = nil
+			} else if clos == nil {
+				clos = childo.InitHeapList(childo.deep)
+				heap.Init(clos)
 			} else {
 				childo.AddGameDataToHeapList(clos)
 			}
@@ -272,7 +287,7 @@ func GetHeapPath(queue *PrioQueue, childPawn []NextPawns, turn int) []NextPawns 
 	var i int
 
 	childPawnLen = len(childPawn)
-	for len(*queue) > 0 {
+	for queue != nil && len(*queue) > 0 {
 		childs = heap.Pop(queue).(GameData)
 		i = 0
 		for i < childPawnLen && (childs.move.x != childPawn[i].pawn_p.x || childPawn[i].pawn_p.y != childs.move.y) {
@@ -351,8 +366,7 @@ func (childs *GameData) UseOfIA(turn int) float32 {
 	 * 	OR RETURN CURRENT TURN PROB
 	 * 	AND CHECK USEFULNESS OF .prob
 	**/
-	return childs.GetOtherPlayer(turn).winpot * (float32)(childs.prob) * -1.0
-	return childs.GetPlayer(turn).winpot*(float32)(childs.prob) - childs.GetOtherPlayer(turn).winpot*(float32)(childs.prob)
+	return childs.GetOtherPlayer(turn).winpot * -1.0
 	//return childs.human.winpot * (float32)(childs.prob) * -1.0
 	//return childs.facundo.winpot*(float32)(childs.prob) - childs.human.winpot*(float32)(childs.prob)
 	if childs.ai == 1 {

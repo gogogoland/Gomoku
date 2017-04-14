@@ -129,6 +129,47 @@ func (get *Pawns) GetY() int {
 }
 
 /**
+ * 	For Slice of Pawns
+**/
+
+func (data *SlicePn) Add(new Pawns) {
+	var cur, lenSlice int
+
+	lenSlice = len(*data)
+	for cur = 0; cur < lenSlice; cur++ {
+		if (*data)[cur].Compare(new) {
+			return
+		}
+	}
+	*data = append(*data, new)
+}
+
+func (data *SlicePn) Del(del Pawns) {
+	var cur, lenSlice int
+
+	lenSlice = len(*data)
+	for cur = 0; cur < lenSlice; cur++ {
+		if (*data)[cur].Compare(del) {
+			(*data)[cur] = (*data)[lenSlice-1]
+			*data = (*data)[:lenSlice-1]
+			return
+		}
+	}
+}
+
+func (data SlicePn) Copy() SlicePn {
+	var theone SlicePn
+	var lenAlP, curAlP int
+
+	lenAlP = len(data)
+	theone = make(SlicePn, lenAlP)
+	for curAlP = 0; curAlP < lenAlP; curAlP++ {
+		theone[curAlP] = data[curAlP].Copy()
+	}
+	return theone
+}
+
+/**
  * 	End Functions for Pawns
 **/
 
@@ -225,7 +266,9 @@ func PlayerInit(whoareyou int) Player {
 		whoami: whoareyou,
 		pawn_p: PawnsInit(-1, -1),
 		five_w: nil,
+		four_w: nil,
 		threef: nil,
+		eating: nil,
 		winpot: 0.0,
 	}
 }
@@ -236,7 +279,9 @@ func (data *Player) Copy() Player {
 		whoami: data.whoami,
 		pawn_p: data.pawn_p.Copy(),
 		five_w: data.five_w.Copy(),
+		four_w: data.four_w.Copy(),
 		threef: data.threef.Copy(),
+		eating: data.eating.Copy(),
 		winpot: data.winpot,
 	}
 }
@@ -261,12 +306,20 @@ func (get *Player) GetFive_W() SliceAP {
 	return get.five_w
 }
 
-//func (get *Player) GetFour_W() SliceAP {
-//	return get.four_w
-//}
-
 func (get *Player) GetThreeF() SliceAP {
 	return get.threef
+}
+
+func (get *Player) GetEating() SlicePn {
+	return get.eating
+}
+
+func (get *Player) GetWinPot() float32 {
+	return get.winpot
+}
+
+func (get *Player) GetFour_W() SliceAP {
+	return get.four_w
 }
 
 //func (get *Player) GetToFree() SliceAP {
@@ -280,10 +333,6 @@ func (get *Player) GetThreeF() SliceAP {
 //func (get *Player) GetThreeP() SliceAP {
 //	return get.threep
 //}
-
-func (get *Player) GetWinPot() float32 {
-	return get.winpot
-}
 
 /**
  * 	End Functions for Player

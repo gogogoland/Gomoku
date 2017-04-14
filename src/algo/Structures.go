@@ -25,6 +25,9 @@ type Pawns struct {
 	x, y int
 }
 
+//	*	Slice of Pawns
+type SlicePn []Pawns
+
 //	*	Alignement of Pawns
 type AlignP struct {
 	pos Pawns
@@ -40,12 +43,13 @@ type Player struct {
 	whoami int
 	pawn_p Pawns
 	five_w SliceAP
-	//four_w SliceAP
+	four_w SliceAP
 	threef SliceAP
+	eating SlicePn
+	winpot float32
 	//tofree SliceAP
 	//four_p SliceAP
 	//threep SliceAP
-	winpot float32
 }
 
 //	*	Board data
