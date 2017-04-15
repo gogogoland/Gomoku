@@ -33,7 +33,6 @@ func (heapList *PrioQueue) Push(toAdd interface{}) {
 		maxy:    toAdd.(GameData).maxy,
 		deep:    toAdd.(GameData).deep,
 		move:    toAdd.(GameData).move,
-		prob:    toAdd.(GameData).prob,
 		turn:    toAdd.(GameData).turn,
 		whowin:  toAdd.(GameData).whowin,
 	})
@@ -55,10 +54,6 @@ func (heapList PrioQueue) Swap(i, j int) {
 
 //	*	Check order by deepness and scoring value
 func (heapList PrioQueue) Less(i, j int) bool {
-	/*if heapList[i].deep == heapList[j].deep {
-		return heapList[i].UseOfIA(heapList[i].turn) > heapList[j].UseOfIA(heapList[j].turn)
-	}
-	return heapList[i].deep > heapList[j].deep*/
 	if heapList[i].UseOfIA(heapList[i].turn) == heapList[j].UseOfIA(heapList[j].turn) {
 		return heapList[i].deep > heapList[j].deep
 	}

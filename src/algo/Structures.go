@@ -64,12 +64,10 @@ type GameData struct {
 	maxy   int
 	deep   int
 	move   Pawns
-	prob   int
 	turn   int
 	whowin int
 	round  int
 	ai     int
-	//Add probabilty ?
 	//wilo	float32
 }
 

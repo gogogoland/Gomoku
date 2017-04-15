@@ -39,73 +39,6 @@ import (
  *
  *	Start timer and reset Mome first move
  * 	Implementation of A* using MinMax method for euristic
- * 	(each comments beginning with "//link" keyword are for channels (see goroutine))
- * 	(each comments beginning with "//direct" keyword are for stopping A*
- * 		in first seen Win or Lose)
-**/
-/*func (Mom *GameData) Pathfinding(deepness, IA int) {
-	var maxMove, childNum int
-	var childs GameData
-	//link//var link chan GameData
-	var open, clos *PrioQueue
-	var childPawn []NextPawns
-
-	timeStart := time.Now()
-	Mom.move = PawnsInit(-1, -1)
-	Mom.SetIA(IA)
-	//link////Set number of proc
-	//link//runtime.GOMAXPROCS(runtime.NumCPU())
-	//link//fmt.Println(runtime.NumGoroutine())
-	//link////Make link between goroutine and original tree
-	//link//link = make(chan GameData)
-
-	open = Mom.InitHeapList(deepness)
-	heap.Init(open)
-	clos = Mom.InitHeapList(-1)
-	heap.Init(clos)
-
-	for len(*open) > 0 && time.Since(timeStart).Nanoseconds()/1000000 < 500 {
-		childs = heap.Pop(open).(GameData)
-		childs.turn = childs.GetOtherTurn()
-		childPawn = childs.GetPossiblePlace()
-		childNum = len(childPawn)
-		maxMove = childNum
-		//link//for i := 0; i < childNum; i++ {
-		//link//	go MinMax(childs, childPawn[i], link)
-		//link//}
-		for i := 0; i < childNum; {
-			//link//childo, lessMove := <-link
-			childo, lessMove := MinMax(childs, childPawn[i])
-			if lessMove > 0 {
-				childNum -= lessMove
-				maxMove -= lessMove
-				childPawn[i] = childPawn[childNum]
-				childPawn = childPawn[:childNum]
-				continue
-			}
-			i++
-			childo.prob = GetProbabilityByDeepness(childo.deep, childNum, 1)
-			//direct//if childs.human.winpot >= 1.0 || childo.facundo.winpot >= 1.0 {
-			//direct//	childo.AddGameDataToHeapList(clos)
-			//direct//	Mom.GetOptimalPath(clos, IA, timeStart)
-			//direct//	return
-			//direct//} else if childo.deep != 0 {
-			if childo.deep != 0 && childo.facundo.winpot < 1.0 && childo.human.winpot < 1.0 {
-				childo.AddGameDataToHeapList(open)
-			} else {
-				childo.AddGameDataToHeapList(clos)
-			}
-		}
-	}
-
-	Mom.GetOptimalPath(clos, open, timeStart)
-}*/
-
-/**
- * 	"Pathfinding"
- *
- *	Start timer and reset Mome first move
- * 	Implementation of A* using MinMax method for euristic
  * 	Check even number of layer
  * 	(each comments beginning with "//link" keyword are for channels (see goroutine))
  * 	(each comments beginning with "//direct" keyword are for stopping A*
@@ -121,6 +54,8 @@ func (Mom *GameData) Pathfinding(deepness, IA int, vs bool) {
 
 	timeStart := time.Now()
 	Mom.move = PawnsInit(-1, -1)
+	Mom.GetHuman().pawn_p = PawnsInit(-1, -1)
+	Mom.GetFacundo().pawn_p = PawnsInit(-1, -1)
 	Mom.SetIA(IA)
 	//link////Set number of proc
 	//link//runtime.GOMAXPROCS(runtime.NumCPU())
@@ -133,7 +68,7 @@ func (Mom *GameData) Pathfinding(deepness, IA int, vs bool) {
 	clos = nil
 	hope = nil
 
-	for len(*open) > 0 && time.Since(timeStart).Nanoseconds()/1000000 < 500 {
+	for len(*open) > 0 && time.Since(timeStart).Nanoseconds()/1000000 < 450 {
 		childs = heap.Pop(open).(GameData)
 		childs.turn = childs.GetOtherTurn()
 		childPawn = childs.GetPossiblePlace()
@@ -142,13 +77,9 @@ func (Mom *GameData) Pathfinding(deepness, IA int, vs bool) {
 		//link//	go MinMax(childs, childPawn[i], link)
 		//link//}
 		//LINK TO US FOR EACH LAYER
-		for i := 0; i < childNum; {
+		for i := 0; i < childNum && time.Since(timeStart).Nanoseconds()/1000000 < 450; {
 			//link//childo, lessMove := <-link
 			childo, less = MinMax(childs, childPawn[i])
-			/*if childPawn.RemoveInvalidMove(less, i) {
-				childNum -= less
-				continue
-			}*/
 			if less == 1 {
 				childPawn[i] = childPawn[childNum-1]
 
@@ -168,9 +99,7 @@ func (Mom *GameData) Pathfinding(deepness, IA int, vs bool) {
 						childoPawn = childoPawn[:childoNum-1]
 						childoNum -= 1
 						continue
-						//} else if len(childt.GetHuman().GetFive_W()) > 0 { //.GetWhoAmI() == childt.Gain() {
-						//} else if childt.GetHuman().GetWhoAmI() == childt.Gain() {
-					} else if childt.GetHuman().GetWhoAmI() == childt.Gain() || len(childt.GetHuman().GetFive_W()) > 0 {
+					} else if childt.GetHuman().GetWhoAmI() == childt.Gain() {
 						if clos == nil {
 							clos = childt.InitHeapList(childt.deep)
 							heap.Init(clos)
@@ -187,7 +116,7 @@ func (Mom *GameData) Pathfinding(deepness, IA int, vs bool) {
 					}
 					j++
 				}
-				for j := 0; j < childoNum; j++ {
+				for j := 0; j < childoNum && time.Since(timeStart).Nanoseconds()/1000000 < 450; j++ {
 					childt = heap.Pop(hope).(GameData)
 					if childo.deep != 0 && childo.facundo.winpot < 1.0 {
 						childt.AddGameDataToHeapList(open)
@@ -211,18 +140,6 @@ func (Mom *GameData) Pathfinding(deepness, IA int, vs bool) {
 	}
 	Mom.GetOptimalPath(clos, open, timeStart, vs)
 }
-
-/*func (child *NextPawns) RemoveInvalidMove(less, cur int) int {
-	var childLen int
-
-	if less == 0 {
-		return 0
-	}
-	childLen = len(*child)
-	child[cur] = child[childLen]
-	child = child[:childLen]
-	return 1
-}*/
 
 /**
  * 	"Get Optimal Path"
@@ -285,6 +202,7 @@ func GetHeapPath(queue *PrioQueue, childPawn []NextPawns, turn int) []NextPawns 
 	var childs GameData
 	var childPawnLen int
 	var i int
+	var cur float32
 
 	childPawnLen = len(childPawn)
 	for queue != nil && len(*queue) > 0 {
@@ -294,10 +212,10 @@ func GetHeapPath(queue *PrioQueue, childPawn []NextPawns, turn int) []NextPawns 
 			i++
 		}
 		if i < childPawnLen {
-			childPawn[i].winpot *= (float32)(childPawn[i].test_n)
-			childPawn[i].test_n += childs.prob
-			childPawn[i].winpot += (float32)(childs.UseOfIA(turn))
-			childPawn[i].winpot = childPawn[i].winpot / (float32)(childPawn[i].test_n)
+			cur = childs.UseOfIA(turn)
+			if childPawn[i].winpot > cur {
+				childPawn[i].winpot = cur
+			}
 			childPawn[i].tested = true
 		}
 	}
@@ -305,21 +223,8 @@ func GetHeapPath(queue *PrioQueue, childPawn []NextPawns, turn int) []NextPawns 
 }
 
 /**
- * 	"Get Probability By Deepness"
- *
- * 	Get best probability if it's not at maximum deepness
-**/
-func GetProbabilityByDeepness(deep, probmax, probmin int) int {
-	if deep != 0 {
-		return probmax
-	}
-	return probmin
-}
-
-/**
  * 	"Get Available Places"
  *
- *	Get number of potential move for GamdeData.prob
  * 	Return an array of NextPawns for all box close to a pawn
 **/
 func (gd *GameData) GetPossiblePlace() []NextPawns {
@@ -337,12 +242,11 @@ func (gd *GameData) GetPossiblePlace() []NextPawns {
 		}
 	}
 
-	gd.prob = np_size
 	np = make([]NextPawns, np_size)
 	for curx = 0; curx < gd.maxx; curx++ {
 		for cury = 0; cury < gd.maxy; cury++ {
 			if gd.board[curx][cury] == 0 || gd.board[curx][cury] == -1*gd.turn {
-				np[i] = NextPawnsInit(curx, cury, np_size, 0.0, false)
+				np[i] = NextPawnsInit(curx, cury, np_size, 1.0, false)
 				i++
 			}
 		}
@@ -359,22 +263,13 @@ func (gd *GameData) GetPossiblePlace() []NextPawns {
  * 	Facundo's mighty (mixt between defense and attack)
 **/
 func (childs *GameData) UseOfIA(turn int) float32 {
-	//return 0 - childs.human.winpot*(float32)(childs.prob)
-	//if childs.GetPlayer(childs.turn)
-	/**
-	 * 	ADD TURN CONDITION
-	 * 	OR RETURN CURRENT TURN PROB
-	 * 	AND CHECK USEFULNESS OF .prob
-	**/
-	return childs.GetOtherPlayer(turn).winpot * -1.0
-	//return childs.human.winpot * (float32)(childs.prob) * -1.0
-	//return childs.facundo.winpot*(float32)(childs.prob) - childs.human.winpot*(float32)(childs.prob)
-	if childs.ai == 1 {
-		return childs.GetPlayer(turn).winpot * (float32)(childs.prob)
-		//return childs.facundo.winpot * (float32)(childs.prob)
-	} else if childs.ai == 0 {
-		return childs.GetOtherPlayer(turn).winpot * (float32)(childs.prob) * -1.0
-		//return childs.human.winpot * (float32)(childs.prob) * -1.0
+	return BoolToFloat32(childs.GetPlayer(turn).atenum == 5) + BoolToFloat32(len(childs.GetPlayer(turn).five_w) > 0) - childs.GetOtherPlayer(turn).winpot
+	if childs.ai == 0 {
+		return childs.GetPlayer(turn).winpot
+	} else if childs.ai == 1 {
+		return childs.GetOtherPlayer(turn).winpot * -1.0
+	} else if childs.ai == 2 {
+		return BoolToFloat32(childs.GetPlayer(turn).atenum == 5) + BoolToFloat32(len(childs.GetPlayer(turn).five_w) > 0) - childs.GetOtherPlayer(turn).winpot
 	}
 	return 0.0
 }

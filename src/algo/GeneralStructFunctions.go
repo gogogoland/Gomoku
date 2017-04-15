@@ -230,7 +230,7 @@ func BoardIntInit(height, width, value int) Board {
 		}
 	}
 	//Beg Special rules
-	board[height/2+height%2][width/2+width%2] = 0
+	board[height/2][width/2] = 0
 	//End Special rules
 	return board
 }
@@ -351,7 +351,6 @@ func GameDataInit(whobegin int) GameData {
 		maxy:    19,
 		deep:    0,
 		move:    PawnsInit(-1, -1),
-		prob:    0,
 		turn:    whobegin,
 		whowin:  0,
 		round:   0,
@@ -368,7 +367,6 @@ func (data *GameData) Copy() GameData {
 		maxy:    data.maxy,
 		deep:    data.deep,
 		move:    data.move.Copy(),
-		prob:    data.prob,
 		turn:    data.turn,
 		whowin:  data.whowin,
 		round:   data.round,
@@ -455,10 +453,6 @@ func (get *GameData) GetOtherTurn() int {
 		return get.human.whoami
 	}
 	return 0
-}
-
-func (get *GameData) GetProb() int {
-	return get.prob
 }
 
 func (get *GameData) PrintBoard() {

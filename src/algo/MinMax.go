@@ -191,7 +191,7 @@ func (player *Player) CheckAlignPawnPlayer(Board [][]int) {
 
 	lenSlice = len(player.eating)
 	for i = 0; i < lenSlice; i++ {
-		if player.eating[i].x > 19 || player.eating[i].x < 0 || player.eating[i].y > 19 || player.eating[i].y < 0 || Board[player.eating[i].x][player.eating[i].y] > 0 {
+		if player.eating[i].x > 18 || player.eating[i].x < 0 || player.eating[i].y > 18 || player.eating[i].y < 0 || Board[player.eating[i].x][player.eating[i].y] > 0 {
 			player.eating[i] = player.eating[len(player.eating)-1]
 			player.eating = player.eating[:len(player.eating)-1]
 			lenSlice--
@@ -305,7 +305,7 @@ func (player *Player) CheckPlayerWinLose(turn int) float32 {
 	} else {
 		player.winpot = (float32)(player.atenum) / 5.0
 	}
-	player.winpot += (1.0 - player.winpot) * (0.6 * BoolToFloat32(len(player.five_w) > 0))
+	player.winpot += (1.0 - player.winpot) * (0.75 * BoolToFloat32(len(player.five_w) > 0))
 	player.winpot += (1.0 - player.winpot) * (0.45 - (0.45 / (float32)(len(player.threef)+1)))
 	player.winpot += (1.0 - player.winpot) * (0.3 - (0.3 / (float32)(len(player.threef)+1)))
 	player.winpot += (1.0 - player.winpot) * (0.15 - (0.15 / (float32)(len(player.eating)+1)))
@@ -372,6 +372,8 @@ func (child *GameData) TurnProcess(pawn Pawns) int {
 	child.CheckAlignement(pawn)
 	if len(child.GetPlayer(child.turn).threef) > FreeThree && FreeThree > 0 {
 		return 1
+	} else if child.GetPlayer(child.turn).pawn_p.Compare(PawnsInit(-1, -1)) {
+		child.GetPlayer(child.turn).pawn_p = pawn
 	}
 	child.CheckEatPawn(pawn)
 	child.GetPlayer(child.GetOtherTurn()).CheckAlignPawnPlayer(child.board)
